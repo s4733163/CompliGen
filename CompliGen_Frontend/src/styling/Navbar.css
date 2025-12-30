@@ -1,0 +1,190 @@
+/* Navbar Base Styles */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: transparent;
+    transition: all 0.3s ease-in-out;
+    padding: 1rem 0;
+}
+
+/* Navbar when scrolled */
+.navbar-scrolled {
+    background-color: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(14, 51, 77, 0.1);
+    padding: 0.5rem 0;
+}
+
+/* Container */
+.navbar-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Brand Section */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.navbar-brand:hover {
+    transform: translateY(-2px);
+}
+
+.navbar-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.navbar-scrolled .navbar-logo {
+    width: 36px;
+    height: 36px;
+}
+
+.navbar-brand:hover .navbar-logo {
+    transform: rotate(5deg) scale(1.05);
+}
+
+.navbar-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0e334d;
+    letter-spacing: -0.5px;
+    transition: color 0.3s ease;
+}
+
+.navbar-scrolled .navbar-title {
+    font-size: 1.375rem;
+}
+
+/* Actions Section */
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Button Base Styles */
+.btn-signup,
+.btn-login {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.938rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+}
+
+/* Sign Up Button */
+.btn-signup {
+    background-color: transparent;
+    color: #0e334d;
+    border: 2px solid #0e334d;
+}
+
+.btn-signup:hover {
+    background-color: #0e334d;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(14, 51, 77, 0.2);
+}
+
+.navbar-scrolled .btn-signup {
+    background-color: transparent;
+    color: #0e334d;
+}
+
+/* Log In Button */
+.btn-login {
+    background-color: #0e334d;
+    color: white;
+    border: 2px solid #0e334d;
+}
+
+.btn-login:hover {
+    background-color: #0a2538;
+    border-color: #0a2538;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(14, 51, 77, 0.3);
+}
+
+/* Button active states */
+.btn-signup:active,
+.btn-login:active {
+    transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .navbar-container {
+        padding: 0 1rem;
+    }
+
+    .navbar-logo {
+        width: 36px;
+        height: 36px;
+    }
+
+    .navbar-scrolled .navbar-logo {
+        width: 32px;
+        height: 32px;
+    }
+
+    .navbar-title {
+        font-size: 1.25rem;
+    }
+
+    .navbar-scrolled .navbar-title {
+        font-size: 1.125rem;
+    }
+
+    .navbar-actions {
+        gap: 0.5rem;
+    }
+
+    .btn-signup,
+    .btn-login {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-title {
+        font-size: 1.125rem;
+    }
+
+    .navbar-scrolled .navbar-title {
+        font-size: 1rem;
+    }
+
+    .btn-signup,
+    .btn-login {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.813rem;
+    }
+}
+
+/* Smooth scroll for the page */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Optional: Add space at top of page content to prevent navbar overlap */
+body {
+    padding-top: 80px; /* Adjust based on your navbar height */
+}

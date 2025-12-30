@@ -1,0 +1,211 @@
+/* ============================================
+   AUTHENTICATED NAVBAR
+   ============================================ */
+
+.auth-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 2px 10px rgba(14, 51, 77, 0.08);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.auth-navbar-scrolled {
+  box-shadow: 0 4px 20px rgba(14, 51, 77, 0.12);
+}
+
+.auth-navbar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+/* Logo */
+.auth-navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.auth-navbar-logo:hover {
+  opacity: 0.8;
+}
+
+.auth-navbar-logo img {
+  width: 40px;
+  height: 40px;
+}
+
+.auth-navbar-logo span {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0e334d;
+  letter-spacing: -0.5px;
+}
+
+/* Desktop Navigation Links */
+.auth-navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.auth-nav-link {
+  background: none;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.auth-nav-link:hover {
+  background-color: #f1f5f9;
+  color: #0e334d;
+}
+
+.auth-nav-link.active {
+  background-color: #e0f2fe;
+  color: #0e334d;
+}
+
+/* User Avatar Section */
+.auth-navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Hamburger Menu (Mobile) */
+.auth-navbar-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.auth-navbar-hamburger span {
+  width: 25px;
+  height: 3px;
+  background-color: #0e334d;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Mobile Menu */
+.auth-mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.auth-mobile-menu.active {
+  max-height: 400px;
+  padding: 1rem 0;
+}
+
+.auth-mobile-link {
+  background: none;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.auth-mobile-link:hover {
+  background-color: #f8fafc;
+  color: #0e334d;
+  border-left-color: #0e334d;
+}
+
+.auth-mobile-link.logout {
+  color: #dc2626;
+  margin-top: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.5rem;
+}
+
+.auth-mobile-link.logout:hover {
+  background-color: #fee2e2;
+  border-left-color: #dc2626;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 900px) {
+  .auth-navbar-links {
+    display: none;
+  }
+
+  .auth-navbar-hamburger {
+    display: flex;
+  }
+
+  .auth-mobile-menu {
+    display: flex;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-navbar-container {
+    padding: 1rem 1.5rem;
+  }
+
+  .auth-navbar-logo span {
+    font-size: 1.25rem;
+  }
+
+  .auth-navbar-logo img {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-navbar-container {
+    padding: 0.875rem 1rem;
+  }
+
+  .auth-navbar-logo span {
+    font-size: 1.125rem;
+  }
+
+  .auth-navbar-logo img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .auth-mobile-link {
+    padding: 0.875rem 1rem;
+    font-size: 0.938rem;
+  }
+}
