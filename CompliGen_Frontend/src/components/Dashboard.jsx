@@ -85,7 +85,7 @@ const Dashboard = () => {
         {/* Hero Section */}
         <div className="dashboard-hero">
           <div className="hero-content">
-            <h1 className="hero-title">Welcome back, {username}</h1>
+            <h1 className="hero-titles">Welcome back, {username}</h1>
             <p className="hero-subtitle">Here's your compliance overview for today</p>
           </div>
           <div className="hero-date">

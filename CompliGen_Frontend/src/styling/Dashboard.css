@@ -46,7 +46,7 @@
   z-index: 1;
 }
 
-.hero-title {
+.hero-titles {
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
@@ -485,7 +485,7 @@
     padding: 1.5rem;
   }
 
-  .hero-title {
+  .hero-titles {
     font-size: 1.75rem;
   }
 
@@ -519,7 +519,7 @@
 }
 
 @media (max-width: 480px) {
-  .hero-title {
+  .hero-titles {
     font-size: 1.5rem;
   }
 
