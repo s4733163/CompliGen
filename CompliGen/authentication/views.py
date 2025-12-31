@@ -75,7 +75,8 @@ class UserVerificationView(APIView):
         token = request.data.get("token")
         if not token:
             return Response({"message": "Token is required"}, status=status.HTTP_400_BAD_REQUEST)
-
+        
+        # check if the token is not expired and does not has bad signature
         try:
             payload = signing.loads(
                 token,
@@ -86,7 +87,8 @@ class UserVerificationView(APIView):
             return Response({"status": "expired"}, status=status.HTTP_400_BAD_REQUEST)
         except signing.BadSignature:
             return Response({"status": "invalid"}, status=status.HTTP_400_BAD_REQUEST)
-
+        
+        # unwrapping the payload
         user_id = payload.get("user_id")
         user = User.objects.filter(id=user_id).first()
 
@@ -99,9 +101,11 @@ class UserVerificationView(APIView):
         if not customer:
             return Response({"message": "Customer not found"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # check if the customer is already verified
         if customer.verified:
             return Response({"message": "User already verified"}, status=status.HTTP_200_OK)
-
+        
+        # ensure that the customer is verifed and save the updates
         customer.verified = True
         customer.save(update_fields=["verified"])
 

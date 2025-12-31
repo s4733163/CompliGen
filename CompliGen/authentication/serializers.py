@@ -23,12 +23,16 @@ class CustomerSerializer(serializers.Serializer):
     def validate(self, data):
         username = (data.get("username") or "").strip()
         raw_email = data.get("email", "")
+
+        # the email must be treated irrespective of case sensitibity
         email = User.objects.normalize_email(raw_email)
 
         # store normalized values back into validated data
+        # the validated data must be the cleaned data
         data["username"] = username
         data["email"] = email
 
+        # check if the username or email exists
         if User.objects.filter(email__iexact=email).exists() or User.objects.filter(username=username).exists():
             raise serializers.ValidationError(
                 {"message": "A user account already exists with the provided credentials."}
@@ -89,11 +93,15 @@ class EmailVerificationSerializer(TokenObtainPairSerializer):
 
         now = timezone.now()
 
+        # this could be the case if the user object exists,
+        # but the customer object corresponding to it does not exists
         if not customer:
             raise serializers.ValidationError(
                 {"message": "Customer not found"}
             )
-
+        
+        # check if the user is verified within 24 hrs if not
+        # they wil have to do the verification and then login
         if (now - authenticated_user.date_joined) > timedelta(hours=24)  and not customer.verified:
             raise serializers.ValidationError(
                 {"message": "Email not verified. Please verify your email to continue."}
