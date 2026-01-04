@@ -6,12 +6,16 @@ from langchain_chroma import Chroma
 from pathlib import Path
 from langchain_community.document_loaders import PyPDFLoader
 from uuid import uuid4
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 # Load environment
 load_dotenv()
 
 # Initialize embeddings model
-embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get("OPENAI_API_KEY"))
+embeddings = GoogleGenerativeAIEmbeddings(
+    model="models/text-embedding-004",
+    google_api_key=os.environ.get("GOOGLE_API_KEY")
+)
 
 # Initialize text splitter
 splitter = RecursiveCharacterTextSplitter(
