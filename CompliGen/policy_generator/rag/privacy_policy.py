@@ -8,6 +8,38 @@ import random
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import date
 
+
+# Load environment
+load_dotenv()
+
+# Initialize LLM
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.0-flash",
+    temperature=.3,
+    api_key=os.getenv("GOOGLE_API_KEY"),
+    streaming=True
+)
+
+# Initialize embeddings model
+embeddings = GoogleGenerativeAIEmbeddings(
+    model="models/text-embedding-004",
+    google_api_key=os.environ.get("GOOGLE_API_KEY")
+) 
+
+# initialise the vector store
+vector_store = Chroma(
+    embedding_function=embeddings,  
+    collection_name="ingested_law_docs",
+    persist_directory="./chroma"
+)
+
+# Simple prompt template
+prompt_template = ChatPromptTemplate.from_messages([
+    ("human", "{input}"),
+])
+
+chain = prompt_template | llm
+
 # prompt for privacy policy generation
 PRIVACY_POLICY_PROMPT = """
     You are an expert Australian privacy law consultant specializing in drafting Privacy Act 1988 compliant privacy policies. You have deep knowledge of all 13 Australian Privacy Principles (APPs) and create clear, professional privacy policies for Australian businesses.
@@ -99,38 +131,6 @@ PRIVACY_POLICY_PROMPT = """
 
 """
 
-
-# Load environment
-load_dotenv()
-
-# Initialize LLM
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
-    temperature=.3,
-    api_key=os.getenv("GOOGLE_API_KEY"),
-    streaming=True
-)
-
-# Initialize embeddings model
-embeddings = GoogleGenerativeAIEmbeddings(
-    model="models/text-embedding-004",
-    google_api_key=os.environ.get("GOOGLE_API_KEY")
-) 
-
-# initialise the vector store
-vector_store = Chroma(
-    embedding_function=embeddings,  
-    collection_name="ingested_law_docs",
-    persist_directory="./chroma"
-)
-
-# Simple prompt template
-prompt_template = ChatPromptTemplate.from_messages([
-    ("human", "{input}"),
-])
-
-chain = prompt_template | llm
-
 def generate_privacy_policy(
     company_name,
     business_description,
@@ -182,8 +182,7 @@ def generate_privacy_policy(
     example_query += f" {industry} {customer_type}"
 
 
-    # this is the retrieval step 
-
+    # RETRIEVAL STEP
     # get the legal docs chunks
     legal_docs = vector_store.similarity_search(
         legal_query,
@@ -219,6 +218,7 @@ def generate_privacy_policy(
     and describe what will happen if this changes.
     """
 
+    # AUGUMENTATION STEP
     prompt = PRIVACY_POLICY_PROMPT.format(
         legal_context = legal_context,
         example_context = example_context,
@@ -247,6 +247,7 @@ def generate_privacy_policy(
         Current_Date=today
     ) 
 
+    # GENERATION STEP
     result = chain.invoke({"input": prompt})
     return result
 

@@ -51,13 +51,14 @@ for file_path in DOCS_DIR.rglob('*.pdf'):
     total_files += 1
     print(f"[{total_files}] Processing: {file_path.name}")
     
-    # Load PDF
-    loader = PyPDFLoader(str(file_path))  # ✅ Convert Path to string
+    # Load PDF in langchain documents
+    loader = PyPDFLoader(str(file_path))  #  Convert Path to string
     docs = loader.load()
     
     # Process based on directory
     if file_path.parent.parent.name == "examples":
         # Example documents
+        # example documents have the type and the company
         file_info = file_path.stem.split("_")
         
         for doc in docs:
@@ -115,7 +116,7 @@ for file_path in DOCS_DIR.rglob('*.pdf'):
                 relative_path = abs_path.replace(base_path, "").lstrip("/")
                 doc.metadata['source'] = relative_path
             
-            # ✅ FIX: Add metadata for laws
+            #  FIX: Add metadata for laws
             doc.metadata.update({
                 'doc_type': 'law',
                 'regulation': file_info,
@@ -124,6 +125,7 @@ for file_path in DOCS_DIR.rglob('*.pdf'):
     
     elif file_path.parent.name == "policy_template":
         # Template documents
+        # name of the file which is being ingested
         file_info = file_path.stem
         
         for doc in docs:
@@ -133,7 +135,7 @@ for file_path in DOCS_DIR.rglob('*.pdf'):
                 relative_path = abs_path.replace(base_path, "").lstrip("/")
                 doc.metadata['source'] = relative_path
             
-            # ✅ FIX: Add metadata for templates
+            # FIX: Add metadata for templates
             doc.metadata.update({
                 'doc_type': 'template',
                 'template_name': file_info
