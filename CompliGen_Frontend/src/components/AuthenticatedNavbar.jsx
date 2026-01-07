@@ -140,6 +140,7 @@ const AuthenticatedNavbar = () => {
                   })
                   .catch(() => {
                       navigate("/login");
+                      localStorage.removeItem("isAuthenticated")
                   });
             }
             localStorage.setItem("isAuthenticated","true")
@@ -186,6 +187,7 @@ const AuthenticatedNavbar = () => {
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
                 localStorage.removeItem("username");
+                localStorage.removeItem("isAuthenticated")
                 navigate("/login");
             }
         };
