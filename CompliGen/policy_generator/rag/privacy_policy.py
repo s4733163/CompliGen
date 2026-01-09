@@ -7,6 +7,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 import random
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import date
+from PrivacyOutput import StructuredPrivacyPolicy
 
 
 # Load environment
@@ -38,7 +39,9 @@ prompt_template = ChatPromptTemplate.from_messages([
     ("human", "{input}"),
 ])
 
-chain = prompt_template | llm
+llm_with_structured_output = llm.with_structured_output(StructuredPrivacyPolicy)
+
+chain = prompt_template | llm_with_structured_output
 
 # prompt for privacy policy generation
 PRIVACY_POLICY_PROMPT = """
@@ -249,8 +252,37 @@ def generate_privacy_policy(
 
     # GENERATION STEP
     result = chain.invoke({"input": prompt})
-    return result
+    return result.model_dump()
 
 
+
+result = generate_privacy_policy(
+    # Basic Company Info
+    company_name="GlobalConnect Pty Ltd",
+    business_description="A cloud-based collaboration platform connecting teams across Australia, New Zealand, and Singapore",
+    industry="Technology - SaaS",
+    company_size="Medium business",
+    location="Melbourne, VIC, Australia",
+    website="https://www.globalconnect.com.au",
+    contact_email="privacy@globalconnect.com.au",
+    phone_number="+61 3 9000 0000",
+    customer_type="Both",
     
-  
+    # Operational Flags - ALL ENABLED
+    international_operations=True,  # ✅ Triggers APP 8
+    serves_children=True,           # ✅ Triggers APP 3
+    payment_data_collected=True,
+    cookies_used=True,
+    marketing_purpose=True,         # ✅ Triggers APP 7
+    
+    # Data Collection
+    data_types="Names, email addresses, phone numbers, profile photos, business information, payment card details (tokenized), IP addresses, device information, location data, usage analytics, communication content",
+    collection_methods="Account registration, profile creation, payment forms, cookies and tracking pixels, mobile app permissions, communication tools within the platform",
+    collection_purposes="To provide collaboration services, process payments, facilitate team communication, send product updates and marketing offers (with consent), improve user experience, ensure platform security, comply with legal obligations",
+    third_parties="Stripe (payment processing), AWS (cloud hosting in Australia and Singapore), SendGrid (email delivery), Google Analytics (usage tracking), Zendesk (customer support), Twilio (SMS notifications)",
+    storage_location="Primary: Australia (AWS Sydney). Secondary/backups: Singapore (AWS). EU users: AWS Frankfurt upon request",
+    security_measures="End-to-end encryption for messages, AES-256 encryption at rest, TLS 1.3 in transit, multi-factor authentication, biometric login options, SOC 2 Type II certified infrastructure, regular penetration testing, employee security training, 24/7 security monitoring",
+    retention_period="Active accounts: for duration of subscription. Inactive accounts: 12 months then archived. Deleted accounts: 90 days for recovery, then permanently deleted. Financial records: 7 years. Marketing data: until opt-out. Backups: 30 days"
+) 
+
+print(result)

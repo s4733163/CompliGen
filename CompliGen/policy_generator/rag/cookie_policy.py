@@ -7,6 +7,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 import random
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import date
+from CookieOutput import StructuredCookiePolicy
 
 # Load environment
 load_dotenv()
@@ -37,7 +38,9 @@ prompt_template = ChatPromptTemplate.from_messages([
     ("human", "{input}"),
 ])
 
-chain = prompt_template | llm
+llm_with_output = llm.with_structured_output(StructuredCookiePolicy)
+
+chain = prompt_template | llm_with_output
 
 COOKIE_POLICY_PROMPT = """
 You are an expert in privacy law and online tracking technologies. You specialize in drafting clear, compliant cookie policies that explain tracking technologies in accessible language while meeting Australian Privacy Act requirements.
@@ -358,7 +361,7 @@ def generate_cookie_policy(
     prompt = prompt.replace("Last Updated: [Current Date]", f"Last Updated: {today}")
 
     result = chain.invoke({"input": prompt})
-    return result
+    return result.model_dump()
 
 
 result = generate_cookie_policy(
@@ -390,4 +393,4 @@ result = generate_cookie_policy(
 )
 
 # LangChain returns an AIMessage
-print(result.content)
+print(result)
