@@ -5,6 +5,7 @@ from datetime import date
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
+from PolicyOutputs import StructuredAcceptableUsePolicy
 
 # -----------------------------
 # Setup (same as your pattern)
@@ -30,7 +31,10 @@ vector_store = Chroma(
 )
 
 prompt_template = ChatPromptTemplate.from_messages([("human", "{input}")])
-chain = prompt_template | llm
+
+llm_with_output = llm.with_structured_output(StructuredAcceptableUsePolicy)
+
+chain = prompt_template | llm_with_output
 
 
 # -----------------------------
@@ -164,7 +168,8 @@ def generate_acceptable_use_policy(
         today=today,
     )
 
-    return chain.invoke({"input": prompt})
+    result = chain.invoke({"input": prompt})
+    return result.model_dump()
 
 policy = generate_acceptable_use_policy(
     # --- Basic Company Information ---
@@ -188,4 +193,4 @@ policy = generate_acceptable_use_policy(
     reporting_illegal_activities="Suspected illegal activity may be reported to Australian law enforcement or relevant regulators where required by law",
 )
 
-print(policy.content)
+print(policy)

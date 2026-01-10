@@ -1,3 +1,5 @@
+# data_processing_agreement.py
+
 import os
 from dotenv import load_dotenv
 from datetime import date
@@ -5,6 +7,7 @@ from datetime import date
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
+from PolicyOutputs import StructuredDataProcessingAgreement
 
 # -----------------------------
 # Setup
@@ -30,7 +33,9 @@ vector_store = Chroma(
 )
 
 prompt_template = ChatPromptTemplate.from_messages([("human", "{input}")])
-chain = prompt_template | llm
+
+llm_with_output = llm.with_structured_output(StructuredDataProcessingAgreement)
+chain = prompt_template | llm_with_output
 
 
 def ns(value: str | None) -> str:
@@ -67,24 +72,6 @@ Use clear, non-technical Australian English.
    - Do NOT invent company facts or details
    - Do NOT include placeholders like [Company Name], <insert>, [ABN], etc.
    - Do NOT quote long passages of legal text verbatim
-   - If a field says "Not specified", write EXACTLY: "Not specified" (no elaboration)
-
-4) INFERENCE RULES (for Annexes):
-   When specific details are "Not specified", intelligently infer reasonable content based on:
-   - The processing_summary provided
-   - The industry_type and business_description
-   - The customer_type
-   - Standard {industry_type} practices
-   
-   For Annex A, ALWAYS infer from context:
-   - Categories of Data Subjects (e.g., if customer_type="Businesses", infer: business employees, customers, contacts)
-   - Types of Personal Information (e.g., if processing_summary mentions "customer datasets", infer: names, contact details, transaction data)
-   - Nature and purpose of processing (from processing_summary)
-   
-   For Annex B, if security_certifications="Not specified":
-   - Provide generic but reasonable TOMs for a {industry_type} business
-   - Include: encryption, access controls, monitoring, incident response, employee training
-   - Do NOT overpromise or invent specific certifications
 
 === LEGAL CONTEXT (RAG) ===
 {legal_context}
@@ -93,218 +80,57 @@ Use clear, non-technical Australian English.
 {example_context}
 
 ========================================================
-1) BASIC COMPANY INFORMATION
+COMPANY INFORMATION
 ========================================================
 Company name: {company_name}
 Business description: {business_description}
 Industry type: {industry_type}
 Company size: {company_size}
-Business location (Australia state/territory): {business_location_state_territory}
-Website URL: {website_url}
+Business location: {business_location_state_territory}
+Website: {website_url}
 Contact email: {contact_email}
-Phone number: {phone_number}
-Customer type (Individuals / Businesses / Both): {customer_type}
-International customers (Yes/No + countries): {international_customers}
-Children under 18 served (Yes/No): {children_under_18_served}
+Phone: {phone_number}
+Customer type: {customer_type}
+International customers: {international_customers}
+Children under 18: {children_under_18_served}
 
-========================================================
-2) DPA FIELDS
-========================================================
-Contract role (Controller/Processor): {role_controller_or_processor}
-Sub-processors used: {sub_processors_used}
-Data processing locations: {data_processing_locations}
-Security certifications: {security_certifications}
-Breach notification timeframe: {breach_notification_timeframe}
-Data deletion timelines: {data_deletion_timelines}
+Role: {role_controller_or_processor}
+Sub-processors: {sub_processors_used}
+Processing locations: {data_processing_locations}
+Security certs: {security_certifications}
+Breach notification: {breach_notification_timeframe}
+Deletion timeline: {data_deletion_timelines}
 Audit rights: {audit_rights}
-Additional processing summary: {processing_summary}
+Processing summary: {processing_summary}
 
 ========================
-MANDATORY DPA SECTIONS
+GENERATE DPA WITH 21 SECTIONS
 ========================
 
 1. Last Updated
-
 2. Parties and Purpose
-   - Identify parties and state this DPA supplements the main service agreement
-
-3. Definitions
-   - Define: Agreement, Controller, Customer, Data Protection Laws, Personal Data, Personal Information, Processor, Processing, Sub-processor, Eligible Data Breach
-   - PRIMARY: Use "Personal Information" as defined in Privacy Act 1988 (Cth)
-   - CLARIFY: "Personal Data" is equivalent term used in international contracts
-   - NO GDPR article references
-
+3. Definitions (10 terms: Agreement, Controller, Customer, Data Protection Laws, Personal Data, Personal Information, Processor, Processing, Sub-processor, Eligible Data Breach)
 4. Roles and Scope
-   - State whether {company_name} is Processor or Controller
-   - Describe scope of processing
-   - Processing only per Customer instructions
-
 5. Details of Processing
-   - Reference Annex A for full details
-
 6. Processor Obligations
-   - Process only on documented instructions
-   - Ensure personnel confidentiality
-   - Implement appropriate security measures
-   - Notify Customer of Eligible Data Breaches
-   - Assist with compliance under Privacy Act 1988 (Cth) and applicable Data Protection Laws
-   - Allow audits
-   - Inform Customer if instruction may breach Data Protection Laws
-   - DO NOT reference "Article 28" or "Articles 32-36" - describe obligations WITHOUT GDPR citations
-
 7. Controller Obligations
-   - Customer warrants compliance with Data Protection Laws
-   - Customer has legal basis for processing
-   - Customer instructions are lawful
-
 8. Confidentiality
-   - Treat Personal Information as confidential
-   - Personnel bound by confidentiality
-
 9. Security Measures
-   - Describe appropriate technical and organisational measures:
-     * Encryption (at rest and in transit)
-     * Access controls and authentication
-     * Security monitoring and logging
-     * Incident response procedures
-     * Employee security training and confidentiality
-     * Regular security assessments
-   - If {security_certifications} provided, mention them
-   - If "Not specified", provide generic but reasonable measures for {industry_type}
-   - State: measures appropriate to risk, nature of data, and processing context
-
 10. Sub-processors
-    - List actual sub-processors if provided: {sub_processors_used}
-    - If only categories provided, list categories
-    - State: Sub-processor agreements contain equivalent data protection obligations
-    - Processor remains liable for Sub-processor performance
-
-11. Overseas Disclosures and International Data Transfers
-    - APP 8 compliant: take reasonable steps to ensure overseas recipients don't breach APPs
-    - Implement contractual clauses requiring APP-consistent protection
-    - Conduct due diligence on overseas recipients
-    - If {international_customers} mentions countries, reference them
-    - NO GDPR Standard Contractual Clauses language unless specifically about GDPR compliance
-
+11. Overseas Disclosures (APP 8)
 12. Assistance with Individual Rights
-    - Assist Customer with facilitating rights under Data Protection Laws:
-      * Access to Personal Information
-      * Correction of Personal Information
-      * Deletion/erasure
-      * Restriction of processing
-    - Provide assistance within reasonable timeframes
-
-13. Eligible Data Breaches (Notification)
-    - Timeframe: {breach_notification_timeframe}
-    - Notification must include: nature of breach, data affected, mitigation steps, recommendations
-    - Cooperate with Customer on NDB scheme obligations under Privacy Act 1988 (Cth)
-    - Support Customer's assessment of whether breach is "Eligible Data Breach"
-
+13. Eligible Data Breaches (NDB scheme)
 14. Deletion or Return of Data
-    - Timeline: {data_deletion_timelines}
-    - Securely delete or return all Personal Information
-    - Exception: retention required by law
-    - Provide written confirmation when complete
-
 15. Audits and Compliance
-    - Customer audit rights: {audit_rights}
-    - Processor provides information to demonstrate compliance
-    - Reasonable notice, confidentiality, and security constraints apply
-
 16. Liability
-    - Subject to limitations in main Agreement
-    - Clarify what CANNOT be limited:
-      * Fraud or wilful misconduct
-      * Gross negligence
-      * Breach of confidentiality obligations
-      * Any liability that cannot be limited under applicable law
-    - Processor liable for Sub-processor acts/omissions as its own
-    - Each party indemnifies the other for breaches of this DPA
-
 17. Term and Termination
-    - Remains in effect for duration of Agreement
-    - Termination of Agreement terminates DPA
-    - Sections on confidentiality, liability, and data deletion survive termination
-
 18. Changes to This DPA
-    - Processor may update DPA
-    - Customer notified of material changes
-    - Continued use after notice constitutes acceptance
-
 19. Contact Information
-    - Provide: {contact_email}
-    - If {phone_number} provided, include it
-
-20. Annex A – Processing Details
-    Complete this section by inferring from context:
-    
-    - Subject matter of processing: {processing_summary}
-    - Duration: For the term of the Agreement
-    - Nature and purpose of processing: [Infer from {processing_summary} and {business_description}]
-    
-    - Categories of Data Subjects: 
-      [Infer from {customer_type} and {processing_summary}]
-      Example: If customer_type="Businesses" and processing involves "customer datasets", infer:
-      "Business customers' employees, end customers, sales contacts, support inquiries"
-    
-    - Types of Personal Information processed:
-      [Infer from {processing_summary}]
-      Example: If processing_summary mentions "sales/customer datasets", infer:
-      "Names, email addresses, phone numbers, business contact details, transaction data, customer identifiers, usage data"
-    
-    - Data processing locations: {data_processing_locations}
-    
-    - Sub-processors: {sub_processors_used}
-
-21. Annex B – Technical and Organisational Measures (TOMs)
-    
-    If {security_certifications} = "Not specified", provide reasonable TOMs for {industry_type}:
-    
-    **Technical Measures:**
-    - Encryption of Personal Information at rest and in transit (AES-256 or equivalent)
-    - Multi-factor authentication for access to systems containing Personal Information
-    - Network security controls including firewalls and intrusion detection
-    - Regular security monitoring and logging
-    - Secure software development practices
-    - Regular vulnerability assessments and patching
-    
-    **Organisational Measures:**
-    - Access controls based on role and need-to-know principle
-    - Background checks for personnel with access to Personal Information
-    - Confidentiality agreements for all personnel
-    - Regular security awareness training
-    - Incident response and business continuity procedures
-    - Documented policies for data handling and security
-    - Regular review and testing of security measures
-    
-    **Physical Security:**
-    - Secure data centre facilities with access controls
-    - Environmental controls and redundancy
-    - Secure disposal of media containing Personal Information
-    
-    If {security_certifications} provided, state: "The Processor holds the following certifications: {security_certifications}"
-
-=== FINAL CHECKS BEFORE OUTPUT ===
-
-1. Search your output for "GDPR", "Article 28", "Article 32", "Articles 32-36"
-   - If found, REMOVE and replace with Australian law references
-   
-2. Search for "[", "]", "<", ">" symbols
-   - If found in placeholder context, REMOVE them
-   
-3. Check Annex A and B
-   - If they contain "Not specified" as the ONLY content, you did it WRONG
-   - Use inference rules to populate them appropriately
-   
-4. Check all company details
-   - Ensure {company_name}, {contact_email}, {website_url} are used exactly as provided
-   - No invented ABNs, addresses, or other details
+20. Annex A – Processing Details (leave content empty)
+21. Annex B – TOMs (leave content empty)
 
 === OUTPUT FORMAT ===
-Start with: "Last Updated: {today}"
-Then output the complete DPA with numbered sections 1-21 matching the structure above.
-
-Use clear headings. Use Australian English spelling throughout.
+Use Australian English spelling. Generate complete DPA starting with "Last Updated: {today}".
 """
 
 def generate_data_processing_agreement(
@@ -330,17 +156,17 @@ def generate_data_processing_agreement(
     audit_rights: str,
     processing_summary: str | None = None,
 ):
-    today = date.today().strftime("%B %d, %Y")
+    today = date.today().strftime("%Y-%m-%d")
 
-    # RAG: use AU-focused queries as well as international terms
+    # RAG
     legal_docs = vector_store.similarity_search(
-        "Australia Privacy Act 1988 APP 8 overseas disclosure Notifiable Data Breaches scheme eligible data breach notification processor obligations",
+        "Australia Privacy Act 1988 APP 8 overseas disclosure Notifiable Data Breaches scheme processor obligations",
         k=8,
         filter={"doc_type": "law"},
     )
 
     example_docs = vector_store.similarity_search(
-        f"Australian SaaS data processing agreement annex security measures sub-processors overseas disclosure {industry_type}",
+        f"Australian SaaS data processing agreement annex security measures sub-processors {industry_type}",
         k=8,
         filter={
             "$and": [
@@ -375,7 +201,132 @@ def generate_data_processing_agreement(
         today=today,
     )
 
-    return chain.invoke({"input": prompt})
+    result = chain.invoke({"input": prompt})
+    dpa_dict = result.model_dump()
+    
+    # ============================================
+    # POST-PROCESSING: FILL EMPTY FIELDS
+    # ============================================
+    
+    # 1. Top-level fields
+    if not dpa_dict['breach_notification_timeframe']:
+        dpa_dict['breach_notification_timeframe'] = [breach_notification_timeframe]
+    
+    if not dpa_dict['data_deletion_timelines']:
+        dpa_dict['data_deletion_timelines'] = [data_deletion_timelines]
+    
+    if not dpa_dict['audit_rights']:
+        dpa_dict['audit_rights'] = [audit_rights]
+    
+    if not dpa_dict['data_processing_locations']:
+        locations = [loc.strip() for loc in data_processing_locations.split(';')]
+        dpa_dict['data_processing_locations'] = locations
+    
+    # 2. Definitions
+    if not dpa_dict['definitions']['terms']:
+        dpa_dict['definitions']['terms'] = [
+            "Agreement: The main service agreement between the parties to which this DPA is appended.",
+            "Controller: The entity that determines the purposes and means of processing Personal Information.",
+            "Customer: The entity that has entered into the Agreement with the Processor.",
+            "Data Protection Laws: All applicable laws relating to Personal Information, including the Privacy Act 1988 (Cth) and the APPs.",
+            "Personal Data: Information relating to an identified or identifiable natural person (equivalent to Personal Information, used in international contracts).",
+            "Personal Information: Information or an opinion about an identified individual, or an individual who is reasonably identifiable, as defined in the Privacy Act 1988 (Cth).",
+            "Processor: The entity that processes Personal Information on behalf of the Controller.",
+            "Processing: Any operation performed on Personal Information, such as collection, recording, organisation, storage, use, disclosure, or destruction.",
+            "Sub-processor: Any third party engaged by the Processor to process Personal Information on behalf of the Customer.",
+            "Eligible Data Breach: A breach likely to result in serious harm to individuals, as defined under the NDB scheme of the Privacy Act 1988 (Cth)."
+        ]
+    
+    # 3. Annex A
+    if not dpa_dict['annex_a']['subject_matter_of_processing']:
+        dpa_dict['annex_a']['subject_matter_of_processing'] = [
+            processing_summary or "Customer uploads datasets. Platform stores, analyses, and generates reports."
+        ]
+    
+    if not dpa_dict['annex_a']['duration_of_processing']:
+        dpa_dict['annex_a']['duration_of_processing'] = ["For the term of the Agreement"]
+    
+    if not dpa_dict['annex_a']['nature_and_purpose_of_processing']:
+        dpa_dict['annex_a']['nature_and_purpose_of_processing'] = [
+            f"To provide the {company_name} platform",
+            "To store, analyse, and generate reports based on customer data",
+            "To provide customer support and maintain the service"
+        ]
+    
+    if not dpa_dict['annex_a']['categories_of_data_subjects']:
+        if "Businesses" in customer_type or "Business" in customer_type:
+            dpa_dict['annex_a']['categories_of_data_subjects'] = [
+                "Business customers' employees",
+                "End customers",
+                "Sales contacts",
+                "Support inquiries"
+            ]
+        else:
+            dpa_dict['annex_a']['categories_of_data_subjects'] = [
+                "Individual customers",
+                "Website visitors",
+                "Service users"
+            ]
+    
+    if not dpa_dict['annex_a']['types_of_personal_information']:
+        dpa_dict['annex_a']['types_of_personal_information'] = [
+            "Names",
+            "Email addresses",
+            "Phone numbers",
+            "Business contact details",
+            "Transaction data",
+            "Customer identifiers",
+            "Usage data"
+        ]
+    
+    if not dpa_dict['annex_a']['data_processing_locations']:
+        locations = [loc.strip() for loc in data_processing_locations.split(';')]
+        dpa_dict['annex_a']['data_processing_locations'] = locations
+    
+    if not dpa_dict['annex_a']['sub_processors']:
+        categories = [cat.strip() for cat in sub_processors_used.split(';')]
+        dpa_dict['annex_a']['sub_processors'] = [
+            {"category_name": cat, "provider_names": []} for cat in categories
+        ]
+    
+    # 4. Annex B
+    if not dpa_dict['annex_b']['technical_measures']:
+        dpa_dict['annex_b']['technical_measures'] = [
+            "Encryption of Personal Information at rest and in transit (AES-256 or equivalent)",
+            "Multi-factor authentication for access to systems containing Personal Information",
+            "Network security controls including firewalls and intrusion detection",
+            "Regular security monitoring and logging",
+            "Secure software development practices",
+            "Regular vulnerability assessments and patching"
+        ]
+    
+    if not dpa_dict['annex_b']['organisational_measures']:
+        dpa_dict['annex_b']['organisational_measures'] = [
+            "Access controls based on role and need-to-know principle",
+            "Background checks for personnel with access to Personal Information",
+            "Confidentiality agreements for all personnel",
+            "Regular security awareness training",
+            "Incident response and business continuity procedures",
+            "Documented policies for data handling and security",
+            "Regular review and testing of security measures"
+        ]
+    
+    if not dpa_dict['annex_b']['physical_security_measures']:
+        dpa_dict['annex_b']['physical_security_measures'] = [
+            "Secure data centre facilities with access controls",
+            "Environmental controls and redundancy",
+            "Secure disposal of media containing Personal Information"
+        ]
+    
+    # security_certifications stays empty if "Not specified"
+    if security_certifications != "Not specified" and not dpa_dict['annex_b']['security_certifications']:
+        dpa_dict['annex_b']['security_certifications'] = [security_certifications]
+    
+    # 5. Fix phone_number
+    if dpa_dict.get('phone_number') == "Not specified":
+        dpa_dict['phone_number'] = None
+    
+    return dpa_dict
 
 
 # -----------------------------
@@ -395,11 +346,10 @@ dpa = generate_data_processing_agreement(
     children_under_18_served="No",
 
     role_controller_or_processor="Processor (ClearView processes personal information on behalf of business customers)",
-    sub_processors_used="Cloud hosting provider; analytics/logging provider; email delivery provider",
-    data_processing_locations="Australia; other locations used by approved sub-processors",
+    sub_processors_used="Cloud hosting provider; Analytics/logging provider; Email delivery provider",
+    data_processing_locations="Australia; Other locations used by approved sub-processors",
     security_certifications="Not specified",
 
-    # AU-first wording: do NOT force GDPR 72h unless you truly want it
     breach_notification_timeframe="Without undue delay after becoming aware of an Eligible Data Breach or suspected compromise involving Personal Information",
     data_deletion_timelines="Within 30 days of termination or upon written request, unless retention is required by law",
     audit_rights="Reasonable audit rights on reasonable notice, subject to confidentiality and security constraints",
@@ -407,4 +357,4 @@ dpa = generate_data_processing_agreement(
     processing_summary="Customer uploads or connects sales/customer datasets. Platform stores, analyses, and generates dashboards and reports. Support staff may access data only to provide support and maintain the service.",
 )
 
-print(dpa.content)
+print(dpa)
