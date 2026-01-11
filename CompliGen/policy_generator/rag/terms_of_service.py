@@ -4,6 +4,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGener
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import date
+from PolicyOutputs import StructuredTermsOfService
 
 # Load environment
 load_dotenv()
@@ -31,7 +32,10 @@ vector_store = Chroma(
 
 # Simple prompt template
 prompt_template = ChatPromptTemplate.from_messages([("human", "{input}")])
-chain = prompt_template | llm
+
+# structured llm with output
+llm_with_output = llm.with_structured_output(StructuredTermsOfService)
+chain = prompt_template | llm_with_output
 
 TERMS_OF_SERVICE_PROMPT = """
 You are an expert Australian commercial law consultant specialising in drafting Australian Consumer Law (ACL) compliant Terms of Service for an Australian SaaS business.
@@ -221,15 +225,96 @@ def generate_terms_of_service(
     )
 
     result = chain.invoke({"input": prompt})
-    output = result.content.strip()
 
-    # Post-clean for banned phrases / accidental leakage
-    output = _strip_banned_phrases(output)
+    # the final json or dict
+    tos_dict = result.model_dump()
+    
+    # ============================================
+    # POST-PROCESSING: Fill empty fields if needed
+    # ============================================
+    
+    # Fix phone_number
+    if tos_dict.get('phone_number') == "Not specified":
+        tos_dict['phone_number'] = None
+    
+    # Ensure ACL statement is exact
+    if not tos_dict.get('acl_statement'):
+        tos_dict['acl_statement'] = "Nothing in these Terms excludes, restricts or modifies rights under the Australian Consumer Law."
+    
+    # Ensure governing_law is set
+    if not tos_dict.get('governing_law'):
+        tos_dict['governing_law'] = "New South Wales, Australia"
+    
+    # Fill service_description if empty
+    if not tos_dict.get('service_description'):
+        tos_dict['service_description'] = [business_description]
+    
+    # Fill service_type if empty
+    if not tos_dict.get('service_type'):
+        tos_dict['service_type'] = [service_type]
+    
+    # Fill pricing_model if empty
+    if not tos_dict.get('pricing_model'):
+        tos_dict['pricing_model'] = [pricing_model]
+    
+    # Fill payment_terms if empty
+    if not tos_dict.get('payment_terms'):
+        tos_dict['payment_terms'] = [payment_terms or "As displayed at checkout and on invoices"]
+    
+    # Fill prohibited_activities if empty
+    if not tos_dict.get('prohibited_activities'):
+        tos_dict['prohibited_activities'] = [
+            "Unauthorised access",
+            "Scraping or data mining",
+            "Malware distribution",
+            "Harassment or abuse",
+            "Violating applicable laws"
+        ]
+    
+    # Clean up any retrieval leaks from sections
+    for section in tos_dict.get('sections', []):
+        section['content'] = [
+            _strip_banned_phrases(item) 
+            for item in section['content']
+        ]
+    
+    return tos_dict
 
-    # Optional: enforce no bracket placeholders
-    forbidden_markers = ["[insert", "[number", "TBD", "to be confirmed", "[List accepted payment methods"]
-    if any(m.lower() in output.lower() for m in forbidden_markers):
-        raise ValueError("Output contains placeholders. Tighten prompt or add stronger post-processing.")
 
-    return output
+def _strip_banned_phrases(text: str) -> str:
+    """Defensive cleanup: remove retrieval leaks"""
+    banned = ["Creative Commons", "Commonwealth of Australia", "Source: Licensed from"]
+    for phrase in banned:
+        text = text.replace(phrase, "")
+    return text
 
+
+# ============================================
+# EXAMPLE USAGE
+# ============================================
+if __name__ == "__main__":
+    tos = generate_terms_of_service(
+        company_name="ClearView Analytics Pty Ltd",
+        business_description="A cloud-based analytics platform that helps small and medium businesses visualise sales and customer data.",
+        industry="Software as a Service (SaaS)",
+        company_size="Small business (under 50 employees)",
+        location="New South Wales",
+        website="https://www.clearviewanalytics.com.au",
+        contact_email="support@clearviewanalytics.com.au",
+        phone_number=None,
+        customer_type="Businesses",
+        international_operations="No",
+        
+        service_type="SaaS analytics platform",
+        pricing_model="Monthly subscription ($49/month)",
+        free_trial="14-day free trial available",
+        refund_policy="Pro-rata refunds available within 30 days",
+        minor_restrictions=False,
+        user_content_uploads=True,
+        prohibited_activities="Unauthorised access, scraping, malware, harassment",
+        
+        subscription_features="Unlimited dashboards, 5 users, 10GB storage",
+        payment_terms="Billed monthly in advance via credit card or PayPal",
+    )
+    
+    print(tos)
