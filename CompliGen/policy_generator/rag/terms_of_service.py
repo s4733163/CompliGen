@@ -4,7 +4,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGener
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import date
-from PolicyOutputs import StructuredTermsOfService
+from policy_outputs import StructuredTermsOfService
 
 # Load environment
 load_dotenv()
@@ -14,7 +14,7 @@ llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     temperature=0.3,
     api_key=os.getenv("GOOGLE_API_KEY"),
-    streaming=True,
+    streaming=False,
 )
 
 # Initialize embeddings model

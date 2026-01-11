@@ -5,7 +5,7 @@ from datetime import date
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
-from PolicyOutputs import StructuredAcceptableUsePolicy
+from policy_outputs import StructuredAcceptableUsePolicy
 
 # -----------------------------
 # Setup (same as your pattern)
@@ -16,7 +16,7 @@ llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     temperature=0.3,
     api_key=os.getenv("GOOGLE_API_KEY"),
-    streaming=True,
+    streaming=False,
 )
 
 embeddings = GoogleGenerativeAIEmbeddings(

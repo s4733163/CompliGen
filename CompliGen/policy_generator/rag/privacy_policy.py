@@ -7,7 +7,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 import random
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import date
-from PrivacyOutput import StructuredPrivacyPolicy
+from privacy_output import StructuredPrivacyPolicy
 
 
 # Load environment
@@ -18,7 +18,7 @@ llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     temperature=.3,
     api_key=os.getenv("GOOGLE_API_KEY"),
-    streaming=True
+    streaming=False
 )
 
 # Initialize embeddings model
