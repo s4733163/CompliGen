@@ -387,7 +387,7 @@ class PrivacyPolicy(models.Model):
 
     # Header
     company_name = models.CharField(max_length=255)
-    last_updated = models.DateField()
+    last_updated = models.CharField(max_length=255)
 
     # Introduction
     introduction = ArrayField(
@@ -518,7 +518,7 @@ class CookiePolicy(models.Model):
 
     # Header
     company_name = models.CharField(max_length=255)
-    last_updated = models.DateField()
+    last_updated = models.CharField(max_length=255)
 
     # Introduction
     introduction = ArrayField(
