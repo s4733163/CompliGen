@@ -41,10 +41,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
     "authentication",
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+    "policy_generator"
 ]
 
 REST_FRAMEWORK = {
