@@ -5,7 +5,7 @@ from datetime import date
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
-from policy_outputs import StructuredAcceptableUsePolicy
+from .policy_outputs import StructuredAcceptableUsePolicy
 
 # -----------------------------
 # Setup (same as your pattern)
@@ -169,28 +169,67 @@ def generate_acceptable_use_policy(
     )
 
     result = chain.invoke({"input": prompt})
+    print(result.model_dump())
     return result.model_dump()
 
-policy = generate_acceptable_use_policy(
-    # --- Basic Company Information ---
-    company_name="ClearView Analytics Pty Ltd",
-    business_description="A cloud-based analytics platform that helps small and medium businesses visualise sales and customer data.",
-    industry_type="Software as a Service (SaaS)",
-    company_size="Small business (under 50 employees)",
-    business_location_state_territory="New South Wales",
-    website_url="https://www.clearviewanalytics.com.au",
-    contact_email="support@clearviewanalytics.com.au",
-    phone_number=None,
-    customer_type="Businesses",
-    international_customers="Yes – New Zealand, Singapore",
+"""
+generate_acceptable_use_policy(
+    company_name="LedgerSafe Pty Ltd",
+    business_description="Cloud-based accounting and financial compliance software for small and medium businesses.",
+    industry_type="FinTech SaaS",
+    company_size="SME (11–50 employees)",
+    business_location_state_territory="Victoria",
+    website_url="https://ledgersafe.com.au",
+    contact_email="legal@ledgersafe.com.au",
+    phone_number="+61 3 9000 1122",
+    customer_type="Businesses (B2B)",
+    international_customers="Yes — Australia and New Zealand",
     children_under_18_served="No",
 
-    # --- AUP Fields ---
-    permitted_usage_types="Commercial business analytics and internal reporting",
-    prohibited_activities="Unauthorised access, scraping, resale of the service, uploading malicious code, harassment, or unlawful data processing",
-    industry_specific_restrictions="The platform must not be used to process health records, credit reports, or other regulated personal data without appropriate legal authority",
-    user_monitoring_practices="Usage logs, access logs, and security events are monitored to detect misuse, fraud, and security incidents",
-    reporting_illegal_activities="Suspected illegal activity may be reported to Australian law enforcement or relevant regulators where required by law",
+    permitted_usage_types="Commercial accounting, financial reporting, internal audits",
+    prohibited_activities="Unauthorised access; credential sharing; scraping; reverse engineering; uploading unlawful financial data; fraud; impersonation",
+    industry_specific_restrictions="No storage of credit card numbers unless PCI-compliant; no use for personal consumer banking decisions",
+    user_monitoring_practices="System access logs and audit trails are monitored for compliance and fraud detection",
+    reporting_illegal_activities="Report suspected fraud or illegal financial activity via contact email; disclosures may be made to regulators where required"
 )
 
-print(policy)
+generate_acceptable_use_policy(
+    company_name="MediInsights Australia Pty Ltd",
+    business_description="Analytics platform providing operational insights for healthcare providers.",
+    industry_type="HealthTech analytics",
+    company_size="Mid-sized (51–200 employees)",
+    business_location_state_territory="Queensland",
+    website_url="https://mediinsights.com.au",
+    contact_email="compliance@mediinsights.com.au",
+    phone_number=None,
+    customer_type="Businesses (Healthcare providers)",
+    international_customers="No — Australia only",
+    children_under_18_served="Yes",
+
+    permitted_usage_types="Clinical operations analysis; workforce planning; internal reporting",
+    prohibited_activities="Uploading identifiable patient data without authority; system misuse; data scraping; malware distribution",
+    industry_specific_restrictions="No diagnostic or treatment decisions may be made solely using platform outputs",
+    user_monitoring_practices="User activity and access logs are monitored; abnormal behaviour may trigger investigation",
+    reporting_illegal_activities="Users should report suspected misuse or unlawful activity via email; mandatory reporting obligations apply where required"
+)
+generate_acceptable_use_policy(
+    company_name="LearnSphere Pty Ltd",
+    business_description="Online learning management system for vocational and professional training providers.",
+    industry_type="EdTech SaaS",
+    company_size="Startup (1–10 employees)",
+    business_location_state_territory="Western Australia",
+    website_url="https://learnsphere.io",
+    contact_email="support@learnsphere.io",
+    phone_number="+61 8 7000 9988",
+    customer_type="Individuals and Businesses",
+    international_customers="Yes — Australia, Singapore, India",
+    children_under_18_served="Yes",
+
+    permitted_usage_types="Educational delivery; course management; learner assessment",
+    prohibited_activities="Harassment; uploading offensive content; copyright infringement; account sharing; security circumvention",
+    industry_specific_restrictions="No use of platform for formal accreditation decisions without human review",
+    user_monitoring_practices="Platform usage and content moderation systems are in place to detect misuse",
+    reporting_illegal_activities="Illegal content or conduct should be reported to support; serious matters may be escalated to authorities"
+)
+
+"""

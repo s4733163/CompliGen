@@ -75,8 +75,9 @@ class StructuredAcceptableUsePolicy(BaseModel):
 
     # Full policy body in ordered sections
     sections: List[AUPSection] = Field(
-        default_factory=list,
-        description="MUST populate: Array of 10-15 policy sections with section_number, heading, and content"
+        ...,  # ✅ REQUIRED! No default
+        min_length=13,  # ✅ Must have at least 13 sections
+        description="Array of 13 policy sections with section_number, heading, and content"
     )
 
 

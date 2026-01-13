@@ -7,7 +7,7 @@ from datetime import date
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
-from policy_outputs import StructuredDataProcessingAgreement
+from .policy_outputs import StructuredDataProcessingAgreement
 
 # -----------------------------
 # Setup
@@ -328,33 +328,3 @@ def generate_data_processing_agreement(
     
     return dpa_dict
 
-
-# -----------------------------
-# Example usage
-# -----------------------------
-dpa = generate_data_processing_agreement(
-    company_name="ClearView Analytics Pty Ltd",
-    business_description="A cloud-based analytics platform that helps small and medium businesses visualise sales and customer data.",
-    industry_type="Software as a Service (SaaS)",
-    company_size="Small business (under 50 employees)",
-    business_location_state_territory="New South Wales",
-    website_url="https://www.clearviewanalytics.com.au",
-    contact_email="support@clearviewanalytics.com.au",
-    phone_number=None,
-    customer_type="Businesses",
-    international_customers="Yes – New Zealand, Singapore",
-    children_under_18_served="No",
-
-    role_controller_or_processor="Processor (ClearView processes personal information on behalf of business customers)",
-    sub_processors_used="Cloud hosting provider; Analytics/logging provider; Email delivery provider",
-    data_processing_locations="Australia; Other locations used by approved sub-processors",
-    security_certifications="Not specified",
-
-    breach_notification_timeframe="Without undue delay after becoming aware of an Eligible Data Breach or suspected compromise involving Personal Information",
-    data_deletion_timelines="Within 30 days of termination or upon written request, unless retention is required by law",
-    audit_rights="Reasonable audit rights on reasonable notice, subject to confidentiality and security constraints",
-
-    processing_summary="Customer uploads or connects sales/customer datasets. Platform stores, analyses, and generates dashboards and reports. Support staff may access data only to provide support and maintain the service.",
-)
-
-print(dpa)

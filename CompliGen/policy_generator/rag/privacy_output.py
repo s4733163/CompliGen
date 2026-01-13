@@ -49,10 +49,10 @@ class PolicySubsection(BaseModel):
 
 class PolicySection(BaseModel):
     section_number: int = Field(..., description="Section number (1, 2, 3...)")
-    heading: str = Field(..., description="Section heading")
-    content: List[str] = Field(..., description="Main section content as paragraphs")
-    subsections: Optional[List[PolicySubsection]] = Field(
-        default=None,
+    heading: str
+    content: List[str]
+    subsections: List[PolicySubsection] = Field(
+        default_factory=list,
         description="Optional subsections"
     )
 

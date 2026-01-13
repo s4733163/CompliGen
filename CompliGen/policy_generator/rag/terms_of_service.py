@@ -4,7 +4,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGener
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import date
-from policy_outputs import StructuredTermsOfService
+from .policy_outputs import StructuredTermsOfService
 
 # Load environment
 load_dotenv()
@@ -287,34 +287,3 @@ def _strip_banned_phrases(text: str) -> str:
     for phrase in banned:
         text = text.replace(phrase, "")
     return text
-
-
-# ============================================
-# EXAMPLE USAGE
-# ============================================
-if __name__ == "__main__":
-    tos = generate_terms_of_service(
-        company_name="ClearView Analytics Pty Ltd",
-        business_description="A cloud-based analytics platform that helps small and medium businesses visualise sales and customer data.",
-        industry="Software as a Service (SaaS)",
-        company_size="Small business (under 50 employees)",
-        location="New South Wales",
-        website="https://www.clearviewanalytics.com.au",
-        contact_email="support@clearviewanalytics.com.au",
-        phone_number=None,
-        customer_type="Businesses",
-        international_operations="No",
-        
-        service_type="SaaS analytics platform",
-        pricing_model="Monthly subscription ($49/month)",
-        free_trial="14-day free trial available",
-        refund_policy="Pro-rata refunds available within 30 days",
-        minor_restrictions=False,
-        user_content_uploads=True,
-        prohibited_activities="Unauthorised access, scraping, malware, harassment",
-        
-        subscription_features="Unlimited dashboards, 5 users, 10GB storage",
-        payment_terms="Billed monthly in advance via credit card or PayPal",
-    )
-    
-    print(tos)

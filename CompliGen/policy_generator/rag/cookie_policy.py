@@ -7,7 +7,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 import random
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import date
-from cookie_output import StructuredCookiePolicy
+from .cookie_output import StructuredCookiePolicy
 
 # Load environment
 load_dotenv()
@@ -363,34 +363,3 @@ def generate_cookie_policy(
     result = chain.invoke({"input": prompt})
     return result.model_dump()
 
-
-result = generate_cookie_policy(
-    # Company info
-    company_name="CompliGen Pty Ltd",
-    business_description="A SaaS platform that helps Australian SMEs generate compliance documents.",
-    industry="SaaS",
-    website="https://www.compligen.com.au",
-    contact_email="support@compligen.com.au",
-    phone_number="+61 2 9000 0000",
-
-    # Cookie flags
-    essential_cookies=True,
-    analytics_cookies=True,
-    marketing_cookies=False,
-    advertising_cookies=False,
-    functional_cookies=False,
-
-    # Third-party services actually used
-    third_party_services=[
-        "Google Analytics"
-    ],
-
-    # Cookie duration
-    cookie_duration=(
-        "Session cookies are deleted when you close your browser. "
-        "Analytics cookies may persist for up to 2 years unless deleted earlier."
-    )
-)
-
-# LangChain returns an AIMessage
-print(result)
