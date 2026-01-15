@@ -361,5 +361,7 @@ def generate_cookie_policy(
     prompt = prompt.replace("Last Updated: [Current Date]", f"Last Updated: {today}")
 
     result = chain.invoke({"input": prompt})
+    # the cookie policy can act strangely and give error.
+    print(result)
     return result.model_dump()
 
