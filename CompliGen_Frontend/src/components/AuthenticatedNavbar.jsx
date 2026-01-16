@@ -266,12 +266,6 @@ const AuthenticatedNavbar = () => {
                     </button>
                     <button 
                         className="auth-nav-link"
-                        onClick={() => handleNavigation('/compliance-checker')}
-                    >
-                        Compliance Checker
-                    </button>
-                    <button 
-                        className="auth-nav-link"
                         onClick={() => handleNavigation('/policy-generator')}
                     >
                         Policy Generator
@@ -353,12 +347,6 @@ const AuthenticatedNavbar = () => {
                     onClick={() => handleNavigation('/dashboard')}
                 >
                     Dashboard
-                </button>
-                <button 
-                    className="auth-mobile-link"
-                    onClick={() => handleNavigation('/compliance-checker')}
-                >
-                    Compliance Checker
                 </button>
                 <button 
                     className="auth-mobile-link"

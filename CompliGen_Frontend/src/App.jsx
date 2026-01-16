@@ -14,7 +14,7 @@ import VerifyEmail from './components/VerifyEmail'
 import ResendVerification from './components/ResendVerification'
 import Dashboard from './components/Dashboard'
 import PolicyGenerator from './components/PolicyGenerator'
-import ComplianceChecker from './components/ComplianceChecker'
+
 
 function App() {
   const router = createBrowserRouter([
@@ -58,10 +58,6 @@ function App() {
     {
       path:"/dashboard",
       element: <Dashboard/>
-    },
-    {
-      path:"/compliance-checker",
-      element: <ComplianceChecker/>
     },
     {
       path:"/policy-generator",
