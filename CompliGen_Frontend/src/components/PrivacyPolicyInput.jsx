@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../styling/AupInput.css'; // Reusing AUP styles
 
 const PrivacyPolicyInput = ({ onPolicyGenerated, onLoadingChange }) => {
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     // Basic Company Information
     company_name: '',
@@ -13,14 +14,14 @@ const PrivacyPolicyInput = ({ onPolicyGenerated, onLoadingChange }) => {
     contact_email: '',
     phone_number: '',
     customer_type: '',
-    
+
     // Privacy-Specific Boolean Fields
     international_operations: false,
     serves_children: false,
     payment_data_collected: false,
     cookies_used: false,
     marketing_purpose: false,
-    
+
     // Data Collection Information
     data_types: '',
     collection_methods: '',
@@ -41,29 +42,74 @@ const PrivacyPolicyInput = ({ onPolicyGenerated, onLoadingChange }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    if (onLoadingChange) onLoadingChange(true);
-    
-    // Simulate policy generation - replace with actual API call later
-    setTimeout(() => {
-      onPolicyGenerated(formData);
+  const submitData = async (access_token) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/documents/generate/api/privacypolicy`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${access_token}`,
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.status === 401) {
+        const refresh_token = localStorage.getItem("refresh_token");
+        const refreshResponse = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh: refresh_token }),
+        });
+
+        const refreshData = await refreshResponse.json();
+
+        if (refreshData.access) {
+          localStorage.setItem("access_token", refreshData.access);
+          return submitData(refreshData.access); // Recursive call with new token
+        } else {
+          throw new Error("Token refresh failed");
+        }
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to generate policy");
+      }
+
+      const data = await response.json();
+      onPolicyGenerated(data);
       setLoading(false);
       if (onLoadingChange) onLoadingChange(false);
-    }, 2000);
+    } catch (error) {
+      console.error("Error:", error);
+      setError(error.message);
+      setLoading(false);
+      if (onLoadingChange) onLoadingChange(false);
+    }
   };
 
+  const handleSubmit = (e) => {
+      e.preventDefault();
+      setError(null); // Clear previous errors
+      setLoading(true);
+      if (onLoadingChange) onLoadingChange(true);
+
+      const access_token = localStorage.getItem("access_token");
+      submitData(access_token);
+  };
+
+
   const industryOptions = [
-    'FinTech SaaS',
-    'HealthTech',
-    'EdTech SaaS',
-    'E-commerce',
-    'Cloud Services',
-    'Analytics Platform',
-    'Marketing Technology',
-    'HR Technology',
-    'Other'
+    'Technology',
+    'Retail & E-commerce',
+    'Manufacturing',
+    'Automotive',
+    'Education',
+    'Hospitality',
+    'Government',
+    'Energy',
+    'Telecommunications',
+    'Professional Services',
   ];
 
   const companySizeOptions = [
@@ -93,12 +139,25 @@ const PrivacyPolicyInput = ({ onPolicyGenerated, onLoadingChange }) => {
   return (
     <div className="aup-container">
       <h2 className="aup-title">Generate Privacy Policy</h2>
-      
+
+      {error && (
+        <div style={{
+          backgroundColor: '#fee',
+          border: '1px solid #fcc',
+          borderRadius: '6px',
+          padding: '12px 16px',
+          marginBottom: '20px',
+          color: '#c00'
+        }}>
+          <strong>Error:</strong> {error}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="aup-form">
         {/* Basic Company Information Section */}
         <div className="aup-section">
           <h3 className="aup-section-title">Basic Company Information</h3>
-          
+
           <div className="aup-grid">
             <div className="aup-form-group">
               <label className="aup-label">
@@ -251,7 +310,7 @@ const PrivacyPolicyInput = ({ onPolicyGenerated, onLoadingChange }) => {
         {/* Privacy Practices Section */}
         <div className="aup-section">
           <h3 className="aup-section-title">Privacy Practices</h3>
-          
+
           <div className="aup-vertical-group">
             <div className="aup-form-group-full">
               <label className="aup-label" style={{ marginBottom: '12px' }}>
@@ -260,7 +319,7 @@ const PrivacyPolicyInput = ({ onPolicyGenerated, onLoadingChange }) => {
               <p className="aup-helper-text" style={{ marginBottom: '12px' }}>
                 Select all that apply to your business
               </p>
-              
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                   <input
@@ -329,7 +388,7 @@ const PrivacyPolicyInput = ({ onPolicyGenerated, onLoadingChange }) => {
         {/* Data Collection Information Section */}
         <div className="aup-section">
           <h3 className="aup-section-title">Data Collection Information</h3>
-          
+
           <div className="aup-vertical-group">
             <div className="aup-form-group-full">
               <label className="aup-label">
@@ -480,8 +539,8 @@ const PrivacyPolicyInput = ({ onPolicyGenerated, onLoadingChange }) => {
           </ul>
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className={`aup-submit-button ${loading ? 'aup-submit-button-disabled' : ''}`}
           disabled={loading}
         >
