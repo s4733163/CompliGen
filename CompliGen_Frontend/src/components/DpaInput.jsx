@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../styling/AupInput.css'; // Reusing AUP styles
 
 const DpaInput = ({ onPolicyGenerated, onLoadingChange }) => {
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     // Basic Company Information
     company_name: '',
@@ -37,30 +38,73 @@ const DpaInput = ({ onPolicyGenerated, onLoadingChange }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    if (onLoadingChange) onLoadingChange(true);
-    
-    // Simulate policy generation - replace with actual API call later
-    setTimeout(() => {
-      onPolicyGenerated(formData);
+  const submitData = async (access_token) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/documents/generate/api/dpa`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${access_token}`,
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.status === 401) {
+        const refresh_token = localStorage.getItem("refresh_token");
+        const refreshResponse = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh: refresh_token }),
+        });
+
+        const refreshData = await refreshResponse.json();
+
+        if (refreshData.access) {
+          localStorage.setItem("access_token", refreshData.access);
+          return submitData(refreshData.access); // Recursive call with new token
+        } else {
+          throw new Error("Token refresh failed");
+        }
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to generate Data Processing Agreement");
+      }
+
+      const data = await response.json();
+      onPolicyGenerated(data);
       setLoading(false);
       if (onLoadingChange) onLoadingChange(false);
-    }, 2000);
+    } catch (error) {
+      console.error("Error:", error);
+      setError(error.message);
+      setLoading(false);
+      if (onLoadingChange) onLoadingChange(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError(null); // Clear previous errors
+    setLoading(true);
+    if (onLoadingChange) onLoadingChange(true);
+
+    const access_token = localStorage.getItem("access_token");
+    submitData(access_token);
   };
 
   const industryOptions = [
-        'Technology',
-        'Retail & E-commerce',
-        'Manufacturing',
-        'Automotive',
-        'Education',
-        'Hospitality',
-        'Government',
-        'Energy',
-        'Telecommunications',
-        'Professional Services',
+    'Technology',
+    'Retail & E-commerce',
+    'Manufacturing',
+    'Automotive',
+    'Education',
+    'Hospitality',
+    'Government',
+    'Energy',
+    'Telecommunications',
+    'Professional Services',
   ];
 
   const companySizeOptions = [
@@ -96,6 +140,19 @@ const DpaInput = ({ onPolicyGenerated, onLoadingChange }) => {
   return (
     <div className="aup-container">
       <h2 className="aup-title">Generate Data Processing Agreement</h2>
+
+      {error && (
+        <div style={{
+          backgroundColor: '#fee',
+          border: '1px solid #fcc',
+          borderRadius: '6px',
+          padding: '12px 16px',
+          marginBottom: '20px',
+          color: '#c00'
+        }}>
+          <strong>Error:</strong> {error}
+        </div>
+      )}
       
       <form onSubmit={handleSubmit} className="aup-form">
         {/* Basic Company Information Section */}
