@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../styling/AupInput.css'; // Reusing AUP styles
 
 const CookiePolicyInput = ({ onPolicyGenerated, onLoadingChange }) => {
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     // Basic Company Information
     company_name: '',
@@ -31,43 +32,100 @@ const CookiePolicyInput = ({ onPolicyGenerated, onLoadingChange }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    if (onLoadingChange) onLoadingChange(true);
-    
-    // Convert third_party_services string to array
-    const submissionData = {
-      ...formData,
-      third_party_services: formData.third_party_services
-        .split(',')
-        .map(s => s.trim())
-        .filter(s => s)
-    };
-    
-    // Simulate policy generation - replace with actual API call later
-    setTimeout(() => {
-      onPolicyGenerated(submissionData);
+  const submitData = async (access_token) => {
+    try {
+      // Convert third_party_services string to array for backend
+      const submissionData = {
+        ...formData,
+        third_party_services: formData.third_party_services
+          .split(',')
+          .map(s => s.trim())
+          .filter(s => s)
+      };
+
+      const response = await fetch(`http://127.0.0.1:8000/documents/generate/api/cookie`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${access_token}`,
+        },
+        body: JSON.stringify(submissionData)
+      });
+
+      if (response.status === 401) {
+        const refresh_token = localStorage.getItem("refresh_token");
+        const refreshResponse = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh: refresh_token }),
+        });
+
+        const refreshData = await refreshResponse.json();
+
+        if (refreshData.access) {
+          localStorage.setItem("access_token", refreshData.access);
+          return submitData(refreshData.access); // Recursive call with new token
+        } else {
+          throw new Error("Token refresh failed");
+        }
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to generate Cookie Policy");
+      }
+
+      const data = await response.json();
+      onPolicyGenerated(data);
       setLoading(false);
       if (onLoadingChange) onLoadingChange(false);
-    }, 2000);
+    } catch (error) {
+      console.error("Error:", error);
+      setError(error.message);
+      setLoading(false);
+      if (onLoadingChange) onLoadingChange(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError(null); // Clear previous errors
+    setLoading(true);
+    if (onLoadingChange) onLoadingChange(true);
+
+    const access_token = localStorage.getItem("access_token");
+    submitData(access_token);
   };
 
   const industryOptions = [
-    'FinTech SaaS',
-    'HealthTech',
-    'EdTech SaaS',
-    'E-commerce',
-    'Cloud Services',
-    'Analytics Platform',
-    'Marketing Technology',
-    'HR Technology',
-    'Other'
+    'Technology',
+    'Retail & E-commerce',
+    'Manufacturing',
+    'Automotive',
+    'Education',
+    'Hospitality',
+    'Government',
+    'Energy',
+    'Telecommunications',
+    'Professional Services',
   ];
 
   return (
     <div className="aup-container">
       <h2 className="aup-title">Generate Cookie Policy</h2>
+
+      {error && (
+        <div style={{
+          backgroundColor: '#fee',
+          border: '1px solid #fcc',
+          borderRadius: '6px',
+          padding: '12px 16px',
+          marginBottom: '20px',
+          color: '#c00'
+        }}>
+          <strong>Error:</strong> {error}
+        </div>
+      )}
       
       <form onSubmit={handleSubmit} className="aup-form">
         {/* Basic Company Information Section */}

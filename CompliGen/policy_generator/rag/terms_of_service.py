@@ -277,13 +277,8 @@ def generate_terms_of_service(
             _strip_banned_phrases(item) 
             for item in section['content']
         ]
-    
+    print(tos_dict)
     return tos_dict
 
 
-def _strip_banned_phrases(text: str) -> str:
-    """Defensive cleanup: remove retrieval leaks"""
-    banned = ["Creative Commons", "Commonwealth of Australia", "Source: Licensed from"]
-    for phrase in banned:
-        text = text.replace(phrase, "")
-    return text
+

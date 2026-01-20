@@ -35,7 +35,7 @@ class PrivacyPolicy(APIView):
             return Response(generated_policy, status=200)
 
         except Exception as e:
-            return Response({"error": str(e)}, status=500)
+            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
 
 
 class TermsOfService(APIView):
@@ -58,7 +58,7 @@ class TermsOfService(APIView):
 
             return Response(generated_policy, status=200)
         except Exception as e:
-            return Response({"error": str(e)}, status=500)
+            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
 
 
 class DataProcessisingAgreement(APIView):
@@ -82,7 +82,7 @@ class DataProcessisingAgreement(APIView):
             return Response(generated_policy, status=200)
 
         except Exception as e:
-            return Response({"error": str(e)}, status=500)
+            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
 
 
 class AcceptableUsePolicy(APIView):
@@ -105,7 +105,7 @@ class AcceptableUsePolicy(APIView):
 
             return Response(generated_policy, status=200)
         except Exception as e:
-            return Response({"error": str(e)}, status=500)
+            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
 
 
 class CookiePolicy(APIView):
@@ -128,7 +128,7 @@ class CookiePolicy(APIView):
 
             return Response(generated_policy, status=200)
         except Exception as e:
-            return Response({"error": str(e)}, status=500)
+            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
 
 
 
