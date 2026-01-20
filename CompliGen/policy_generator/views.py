@@ -36,6 +36,20 @@ class PrivacyPolicy(APIView):
 
         except Exception as e:
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+        
+    def get(self, request):
+        try:
+            # get the customer
+            user = request.user
+            customer = Customer.objects.filter(user=user).first()
+
+            # get all the policies of a customer
+            policies = PrivacyPolicy.objects.filter(customer_linked=customer)
+            serializer =  PrivacyPolicyReadSerializer(policies, many=True)
+            return Response(serializer.data, status=200)
+        
+        except Exception as e:
+            return Response({"error": "Failed to get the policies"}, status=500)
 
 
 class TermsOfService(APIView):
@@ -59,6 +73,20 @@ class TermsOfService(APIView):
             return Response(generated_policy, status=200)
         except Exception as e:
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+        
+    def get(self, request):
+        try:
+            # get the customer
+            user = request.user
+            customer = Customer.objects.filter(user=user).first()
+
+            # get all the policies of a customer
+            policies = TermsOfService.objects.filter(customer_linked=customer)
+            serializer =  TermsOfServiceConversionSerializer(policies, many=True)
+            return Response(serializer.data, status=200)
+        
+        except Exception as e:
+            return Response({"error": "Failed to get the policies"}, status=500)
 
 
 class DataProcessisingAgreement(APIView):
@@ -83,7 +111,20 @@ class DataProcessisingAgreement(APIView):
 
         except Exception as e:
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+    
+    def get(self, request):
+        try:
+            # get the customer
+            user = request.user
+            customer = Customer.objects.filter(user=user).first()
 
+            # get all the policies of a customer
+            policies = DataProcessingAgreement.objects.filter(customer_linked=customer)
+            serializer =  DataProcessingAgreementReadSerializer(policies, many=True)
+            return Response(serializer.data, status=200)
+        
+        except Exception as e:
+            return Response({"error": "Failed to get the policies"}, status=500)
 
 class AcceptableUsePolicy(APIView):
     permission_classes = [IsAuthenticated]
@@ -106,7 +147,20 @@ class AcceptableUsePolicy(APIView):
             return Response(generated_policy, status=200)
         except Exception as e:
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+    
+    def get(self, request):
+        try:
+            # get the customer
+            user = request.user
+            customer = Customer.objects.filter(user=user).first()
 
+            # get all the policies of a customer
+            policies = AcceptableUsePolicy.objects.filter(customer_linked=customer)
+            serializer =  AcceptableUsePolicyReadSerializer(policies, many=True)
+            return Response(serializer.data, status=200)
+        
+        except Exception as e:
+            return Response({"error": "Failed to get the policies"}, status=500)
 
 class CookiePolicy(APIView):
     permission_classes = [IsAuthenticated]
@@ -129,6 +183,19 @@ class CookiePolicy(APIView):
             return Response(generated_policy, status=200)
         except Exception as e:
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+        
+    def get(self, request):
+        try:
+            # get the customer
+            user = request.user
+            customer = Customer.objects.filter(user=user).first()
 
+            # get all the policies of a customer
+            policies = CookiePolicy.objects.filter(customer_linked=customer)
+            serializer =  CookiePolicyReadSerializer(policies, many=True)
+            return Response(serializer.data, status=200)
+        
+        except Exception as e:
+            return Response({"error": "Failed to get the policies"}, status=500)
 
 
