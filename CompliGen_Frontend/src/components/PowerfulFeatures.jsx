@@ -3,26 +3,27 @@ import React from 'react'
 const PowerfulFeatures = () => {
   const mainFeatures = [
     {
-      icon: '🔍',
-      title: 'Compliance Checker',
-      description: 'Upload your security policies and get instant compliance analysis against industry standards.',
+      icon: '📝',
+      title: 'Comprehensive Policy Suite',
+      description: 'Generate all essential legal policies your business needs, fully compliant with Australian law.',
       features: [
-        'ISO 27001 compliance checking',
-        'SOC 2 Trust Services Criteria',
-        'NIST Cybersecurity Framework',
-        'Detailed gap analysis reports'
+        'Privacy Policy (Privacy Act 1988)',
+        'Terms of Service (ACL compliant)',
+        'Cookie Policy (Privacy Act)',
+        'Acceptable Use Policy',
+        'Data Processing Agreement'
       ],
       color: '#3b82f6'
     },
     {
-      icon: '📝',
-      title: 'Policy Generator',
-      description: 'Create professional, legally compliant policies in minutes with our AI-powered templates.',
+      icon: '🇦🇺',
+      title: 'Australian Legal Compliance',
+      description: 'Every policy is tailored to Australian legislation and regulatory requirements.',
       features: [
-        'Privacy Policy (GDPR, CCPA)',
-        'Terms of Service',
-        'Cookie Policy',
-        'Acceptable Use Policy'
+        'Australian Privacy Principles (APPs)',
+        'Australian Consumer Law (ACL)',
+        'OAIC Guidelines compliance',
+        'State-specific regulations'
       ],
       color: '#8b5cf6'
     }
@@ -31,33 +32,33 @@ const PowerfulFeatures = () => {
   const additionalFeatures = [
     {
       icon: '⚡',
-      title: 'Real-time Analysis',
-      description: 'Get instant feedback on your documents with our AI-powered analysis engine'
+      title: 'Instant Generation',
+      description: 'Create complete, professional policies in 2-5 minutes with our AI engine'
+    },
+    {
+      icon: '✨',
+      title: 'Smart Customization',
+      description: 'AI adapts policies to your industry, business size, and specific requirements'
     },
     {
       icon: '📊',
-      title: 'Comprehensive Reports',
-      description: 'Detailed compliance scores, missing controls, and actionable recommendations'
-    },
-    {
-      icon: '🎯',
-      title: 'Gap Identification',
-      description: 'Pinpoint exactly what\'s missing and get specific guidance on improvements'
+      title: 'Structured Documents',
+      description: 'Well-organized policies with clear sections, definitions, and contact details'
     },
     {
       icon: '🔒',
-      title: 'Secure Processing',
-      description: 'Bank-level encryption ensures your sensitive documents stay protected'
+      title: 'Privacy-Focused',
+      description: 'Your business information is never stored or shared with third parties'
     },
     {
       icon: '💾',
-      title: 'Export Options',
-      description: 'Download reports and policies as PDF or DOCX for easy sharing'
+      title: 'Multiple Formats',
+      description: 'Download as PDF, copy text, or export formatted documents instantly'
     },
     {
       icon: '🔄',
-      title: 'Version Control',
-      description: 'Track changes and maintain history of all your compliance documents'
+      title: 'Easy Updates',
+      description: 'Regenerate policies anytime as your business evolves or laws change'
     }
   ]
 
@@ -68,10 +69,10 @@ const PowerfulFeatures = () => {
         <div className="features-header">
           <span className="features-badge">Powerful Features</span>
           <h2 className="features-main-title">
-            Everything You Need for Compliance
+            Everything You Need for Legal Compliance
           </h2>
           <p className="features-main-description">
-            Comprehensive tools to check compliance and generate policies with enterprise-grade accuracy
+            Professional-grade policy generation with Australian legal compliance built-in
           </p>
         </div>
 
@@ -102,7 +103,7 @@ const PowerfulFeatures = () => {
                 style={{ backgroundColor: feature.color }}
                 onClick={() => window.location.href = '/signup'}
               >
-                Try It Free
+                Generate Policy
                 <svg className="btn-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -129,23 +130,23 @@ const PowerfulFeatures = () => {
         {/* Stats Bar */}
         <div className="features-stats-bar">
           <div className="stat-box">
-            <span className="stat-value">100+</span>
-            <span className="stat-label">Compliance Controls</span>
+            <span className="stat-value">5</span>
+            <span className="stat-label">Policy Types</span>
           </div>
           <div className="stat-divider"></div>
           <div className="stat-box">
-            <span className="stat-value">5+</span>
-            <span className="stat-label">Policy Templates</span>
+            <span className="stat-value">100%</span>
+            <span className="stat-label">Australian Compliant</span>
           </div>
           <div className="stat-divider"></div>
           <div className="stat-box">
-            <span className="stat-value">3</span>
-            <span className="stat-label">Standards Supported</span>
+            <span className="stat-value">2-5min</span>
+            <span className="stat-label">Generation Time</span>
           </div>
           <div className="stat-divider"></div>
           <div className="stat-box">
-            <span className="stat-value">99.9%</span>
-            <span className="stat-label">Accuracy Rate</span>
+            <span className="stat-value">15-20</span>
+            <span className="stat-label">Sections Per Policy</span>
           </div>
         </div>
       </div>

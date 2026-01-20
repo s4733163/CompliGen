@@ -4,30 +4,30 @@ const Working = () => {
   const steps = [
     {
       number: '01',
-      icon: '📤',
-      title: 'Upload Your Documents',
-      description: 'Upload your existing security policies, procedures, or internal documents in PDF format.',
+      icon: '📋',
+      title: 'Choose Policy Type',
+      description: 'Select from Privacy Policy, Terms of Service, Cookie Policy, AUP, or DPA based on your needs.',
       color: '#3b82f6'
     },
     {
       number: '02',
-      icon: '🔍',
-      title: 'AI Analysis',
-      description: 'Our AI-powered system analyzes your documents against ISO 27001, SOC 2, and NIST standards.',
+      icon: '✍️',
+      title: 'Fill Simple Form',
+      description: 'Answer straightforward questions about your business, services, and operations in minutes.',
       color: '#8b5cf6'
     },
     {
       number: '03',
-      icon: '📊',
-      title: 'Get Compliance Report',
-      description: 'Receive detailed gap analysis with recommendations and compliance scores for each control.',
+      icon: '🤖',
+      title: 'AI Generation',
+      description: 'Our AI creates a comprehensive, Australian-compliant legal policy tailored to your business.',
       color: '#ec4899'
     },
     {
       number: '04',
-      icon: '📝',
-      title: 'Generate Policies',
-      description: 'Create professional policies like Privacy Policy, Terms of Service, and more in minutes.',
+      icon: '📥',
+      title: 'Download & Deploy',
+      description: 'Get your professional policy instantly. Download as PDF or copy to your website immediately.',
       color: '#10b981'
     }
   ]
@@ -36,22 +36,22 @@ const Working = () => {
     {
       icon: '⚡',
       title: 'Lightning Fast',
-      description: 'Get compliance reports in minutes, not weeks'
+      description: 'Generate complete policies in 2-5 minutes'
     },
     {
-      icon: '🎯',
-      title: 'Highly Accurate',
-      description: 'AI-powered analysis with industry standards'
+      icon: '🇦🇺',
+      title: 'Australian Compliant',
+      description: 'Aligned with Privacy Act, ACL, and OAIC guidelines'
     },
     {
       icon: '🔒',
       title: 'Secure & Private',
-      description: 'Your documents are encrypted and protected'
+      description: 'Your business data is encrypted and protected'
     },
     {
       icon: '💰',
       title: 'Cost Effective',
-      description: 'Save thousands on compliance consultants'
+      description: 'Save thousands on legal fees and consultants'
     }
   ]
 
@@ -62,10 +62,10 @@ const Working = () => {
         <div className="working-header">
           <span className="working-badge">How It Works</span>
           <h2 className="working-title">
-            Simple Process, Powerful Results
+            Create Legal Policies in Minutes
           </h2>
           <p className="working-description">
-            Get compliant in four easy steps. Our platform handles the complexity while you focus on your business.
+            Generate professional, compliant legal documents in four simple steps. No legal expertise required.
           </p>
         </div>
 
@@ -109,13 +109,13 @@ const Working = () => {
         {/* CTA Section */}
         <div className="working-cta">
           <div className="cta-content">
-            <h3 className="cta-title">Ready to Get Started?</h3>
+            <h3 className="cta-title">Ready to Generate Your First Policy?</h3>
             <p className="cta-description">
-              Join companies achieving compliance faster and easier with CompliGen
+              Join Australian businesses creating professional legal documents in minutes
             </p>
           </div>
           <button className="cta-button" onClick={() => window.location.href = '/signup'}>
-            Start Free Trial
+            Start Generating Now
             <svg className="cta-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
             </svg>
