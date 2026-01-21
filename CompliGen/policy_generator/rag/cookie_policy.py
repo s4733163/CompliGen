@@ -6,7 +6,8 @@ import time
 from langchain_google_genai import ChatGoogleGenerativeAI
 import random
 from langchain_core.prompts import ChatPromptTemplate
-from datetime import date
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from .cookie_output import StructuredCookiePolicy
 
 # Load environment
@@ -168,7 +169,8 @@ def generate_cookie_policy(
     You can access the text via `result.content`.
     """
 
-    today = date.today().strftime("%B %d, %Y")
+
+    today = datetime.now(ZoneInfo("Australia/Sydney"))
 
     # -----------------------------
     # 1) Build retrieval queries

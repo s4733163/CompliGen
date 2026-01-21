@@ -14,6 +14,12 @@ import VerifyEmail from './components/VerifyEmail'
 import ResendVerification from './components/ResendVerification'
 import Dashboard from './components/Dashboard'
 import PolicyGenerator from './components/PolicyGenerator'
+import DisplayPolicies from './components/DisplayPolicies'
+import DpaPolicies from './components/DpaPolicies'
+import CookiePolicies from './components/CookiePolicies'
+import PrivacyPolicies from './components/PrivacyPolicies'
+import TosPolicies from './components/TosPolicies'
+import AupPolicies from './components/AupPolicies'
 
 
 function App() {
@@ -62,6 +68,30 @@ function App() {
     {
       path:"/policy-generator",
       element: <PolicyGenerator/>
+    },
+    {
+      path:"/display-policies",
+      element: <DisplayPolicies/>
+    },
+    {
+      path:"/tos",
+      element:<TosPolicies/>
+    },
+    {
+      path:"/cookie",
+      element:<CookiePolicies/>
+    },
+    {
+      path:"/dpa",
+      element:<DpaPolicies/>
+    },
+    {
+      path:"/privacypolicy",
+      element:<PrivacyPolicies/>
+    },
+    {
+      path:"/aup",
+      element:<AupPolicies/>
     }
   ])
 

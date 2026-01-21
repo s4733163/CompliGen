@@ -12,7 +12,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 
-class PrivacyPolicy(APIView):
+class PrivacyPolicyView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
@@ -52,7 +52,7 @@ class PrivacyPolicy(APIView):
             return Response({"error": "Failed to get the policies"}, status=500)
 
 
-class TermsOfService(APIView):
+class TermsOfServiceView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
@@ -89,7 +89,7 @@ class TermsOfService(APIView):
             return Response({"error": "Failed to get the policies"}, status=500)
 
 
-class DataProcessisingAgreement(APIView):
+class DataProcessisingAgreementView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
@@ -126,7 +126,7 @@ class DataProcessisingAgreement(APIView):
         except Exception as e:
             return Response({"error": "Failed to get the policies"}, status=500)
 
-class AcceptableUsePolicy(APIView):
+class AcceptableUsePolicyView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
@@ -162,7 +162,7 @@ class AcceptableUsePolicy(APIView):
         except Exception as e:
             return Response({"error": "Failed to get the policies"}, status=500)
 
-class CookiePolicy(APIView):
+class CookiePolicyView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
@@ -199,3 +199,158 @@ class CookiePolicy(APIView):
             return Response({"error": "Failed to get the policies"}, status=500)
 
 
+
+class PrivacyPolicyDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        user = request.user
+        customer = Customer.objects.filter(user=user).first()
+
+        obj = PrivacyPolicy.objects.filter(id=id, customer_linked=customer).first()
+        if not obj:
+            return Response({"error": "Not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        obj.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TermsOfServiceDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        user = request.user
+        customer = Customer.objects.filter(user=user).first()
+
+        obj = TermsOfService.objects.filter(id=id, customer_linked=customer).first()
+        if not obj:
+            return Response({"error": "Not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        obj.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DataProcessingAgreementDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        user = request.user
+        customer = Customer.objects.filter(user=user).first()
+
+        obj = DataProcessingAgreement.objects.filter(id=id, customer_linked=customer).first()
+        if not obj:
+            return Response({"error": "Not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        obj.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AcceptableUsePolicyDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        user = request.user
+        customer = Customer.objects.filter(user=user).first()
+
+        obj = AcceptableUsePolicy.objects.filter(id=id, customer_linked=customer).first()
+        if not obj:
+            return Response({"error": "Not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        obj.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CookiePolicyDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        user = request.user
+        customer = Customer.objects.filter(user=user).first()
+
+        obj = CookiePolicy.objects.filter(id=id, customer_linked=customer).first()
+        if not obj:
+            return Response({"error": "Not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        obj.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class DashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        customer = Customer.objects.filter(user=user).first()
+
+        if not customer:
+            return Response({"error": "Customer not found"}, status=404)
+
+        # total counts per policy
+        privacy_count = PrivacyPolicy.objects.filter(customer_linked=customer).count()
+        tos_count = TermsOfService.objects.filter(customer_linked=customer).count()
+        dpa_count = DataProcessingAgreement.objects.filter(customer_linked=customer).count()
+        aup_count = AcceptableUsePolicy.objects.filter(customer_linked=customer).count()
+        cookie_count = CookiePolicy.objects.filter(customer_linked=customer).count()
+
+        total_policies = (
+            privacy_count
+            + tos_count
+            + dpa_count
+            + aup_count
+            + cookie_count
+        )
+
+        # latest policy per type
+        latest_privacy = PrivacyPolicy.objects.filter(
+            customer_linked=customer
+        ).order_by("-created_at").first()
+
+        latest_tos = TermsOfService.objects.filter(
+            customer_linked=customer
+        ).order_by("-created_at").first()
+
+        latest_dpa = DataProcessingAgreement.objects.filter(
+            customer_linked=customer
+        ).order_by("-created_at").first()
+
+        latest_aup = AcceptableUsePolicy.objects.filter(
+            customer_linked=customer
+        ).order_by("-created_at").first()
+
+        latest_cookie = CookiePolicy.objects.filter(
+            customer_linked=customer
+        ).order_by("-created_at").first()
+
+        response = {
+            "total_policies": total_policies,
+            "counts": {
+                "privacy_policy": privacy_count,
+                "terms_of_service": tos_count,
+                "data_processing_agreement": dpa_count,
+                "acceptable_use_policy": aup_count,
+                "cookie_policy": cookie_count,
+            },
+            "latest": {
+                "privacy_policy": (
+                    PrivacyPolicyReadSerializer(latest_privacy).data
+                    if latest_privacy else None
+                ),
+                "terms_of_service": (
+                    TermsOfServiceConversionSerializer(latest_tos).data
+                    if latest_tos else None
+                ),
+                "data_processing_agreement": (
+                    DataProcessingAgreementReadSerializer(latest_dpa).data
+                    if latest_dpa else None
+                ),
+                "acceptable_use_policy": (
+                    AcceptableUsePolicyReadSerializer(latest_aup).data
+                    if latest_aup else None
+                ),
+                "cookie_policy": (
+                    CookiePolicyReadSerializer(latest_cookie).data
+                    if latest_cookie else None
+                ),
+            }
+        }
+
+        return Response(response, status=200)
