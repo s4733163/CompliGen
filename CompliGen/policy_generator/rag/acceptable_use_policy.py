@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
-from datetime import date
-
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
@@ -126,8 +126,8 @@ def generate_acceptable_use_policy(
     user_monitoring_practices: str,
     reporting_illegal_activities: str,
 ):
-    today = date.today().strftime("%B %d, %Y")
-
+    today = datetime.now(ZoneInfo("Australia/Sydney"))
+    
     # RAG: legal + examples
     legal_docs = vector_store.similarity_search(
         "acceptable use policy Australia platform misuse monitoring enforcement illegal activity reporting",

@@ -2,8 +2,8 @@
 
 import os
 from dotenv import load_dotenv
-from datetime import date
-
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
@@ -156,8 +156,8 @@ def generate_data_processing_agreement(
     audit_rights: str,
     processing_summary: str | None = None,
 ):
-    today = date.today().strftime("%Y-%m-%d")
-
+    today = datetime.now(ZoneInfo("Australia/Sydney"))
+    
     # RAG
     legal_docs = vector_store.similarity_search(
         "Australia Privacy Act 1988 APP 8 overseas disclosure Notifiable Data Breaches scheme processor obligations",

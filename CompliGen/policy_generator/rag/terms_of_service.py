@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
-from datetime import date
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from .policy_outputs import StructuredTermsOfService
 
 # Load environment
@@ -161,8 +162,8 @@ def generate_terms_of_service(
     subscription_features="",
     payment_terms="",
 ):
-    today = date.today().strftime("%B %d, %Y")
-
+    today = datetime.now(ZoneInfo("Australia/Sydney"))
+    
     # Queries tuned for relevance
     legal_query = (
         "Australian Consumer Law consumer guarantees services major failure remedies "

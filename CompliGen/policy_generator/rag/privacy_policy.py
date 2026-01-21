@@ -6,7 +6,8 @@ import time
 from langchain_google_genai import ChatGoogleGenerativeAI
 import random
 from langchain_core.prompts import ChatPromptTemplate
-from datetime import date
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from .privacy_output import StructuredPrivacyPolicy
 
 
@@ -157,7 +158,7 @@ def generate_privacy_policy(
     security_measures,
     retention_period
 ):
-    today = date.today().strftime("%B %d, %Y")
+    today = datetime.now(ZoneInfo("Australia/Sydney"))
     # CREATE LOCAL VARIABLES (don't modify globals!)
     legal_query = "privacy policy Australian Privacy Principles collection use disclosure security access correction"
     example_query = "privacy policy"
