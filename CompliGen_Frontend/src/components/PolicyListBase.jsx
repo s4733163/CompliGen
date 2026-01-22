@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AuthenticatedNavbar from './AuthenticatedNavbar'
+import { generatePDF } from './Pdfgenerator'
 import '../styling/DisplayPolicies.css'
+
 
 const PolicyListBase = ({ policyType, policyConfig, renderContent }) => {
   const navigate = useNavigate()
@@ -13,6 +15,7 @@ const PolicyListBase = ({ policyType, policyConfig, renderContent }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [policyToDelete, setPolicyToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
+  const [downloading, setDownloading] = useState(false)
 
   useEffect(() => {
     fetchPolicies()
@@ -178,6 +181,22 @@ const PolicyListBase = ({ policyType, policyConfig, renderContent }) => {
     setPolicyToDelete(null)
   }
 
+    const handleDownload = async (policy) => {
+    console.log("1. handleDownload called")
+    console.log("2. Policy:", policy)
+    console.log("3. Config name:", policyConfig.name)
+    
+    try {
+        console.log("4. About to call generatePDF")
+        await generatePDF(policy, policyConfig.name, formatDate)
+        console.log("5. generatePDF completed")
+    } catch (err) {
+        console.error('6. Error in generatePDF:', err)
+        console.error('Error details:', err.message)
+        console.error('Stack:', err.stack)
+    }
+    }
+
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A'
     const date = new Date(dateString)
@@ -215,6 +234,25 @@ const PolicyListBase = ({ policyType, policyConfig, renderContent }) => {
                 </svg>
                 Back to List
               </button>
+
+              <div className="detail-actions">
+                <button 
+                  className="btn-action btn-download" 
+                  onClick={() => handleDownload(selectedPolicy)}
+                  disabled={downloading}
+                >
+                  {downloading ? (
+                    <>
+                      <span className="spinner-small"></span>
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <span>📥</span> Download PDF
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="detail-content">
@@ -340,6 +378,18 @@ const PolicyListBase = ({ policyType, policyConfig, renderContent }) => {
                     <span className="badge-text">{policyConfig.name}</span>
                   </div>
                   <div className="policy-menu">
+                    <button
+                      className="menu-trigger download-icon-btn"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDownload(policy)
+                      }}
+                      title="Download PDF"
+                      disabled={downloading}
+                      style={{ marginRight: '8px' }}
+                    >
+                      📥
+                    </button>
                     <button
                       className="menu-trigger delete-icon-btn"
                       onClick={() => handleDeletePolicy(policy.id)}

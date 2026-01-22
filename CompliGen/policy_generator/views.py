@@ -76,7 +76,7 @@ class PrivacyPolicyView(APIView):
             customer = Customer.objects.filter(user=user).first()
 
             # get all the policies of a customer
-            policies = PrivacyPolicy.objects.filter(customer_linked=customer)
+            policies = PrivacyPolicy.objects.filter(customer_linked=customer).order_by("-created_at")
             serializer =  PrivacyPolicyReadSerializer(policies, many=True)
             return Response(serializer.data, status=200)
         
@@ -123,7 +123,7 @@ class TermsOfServiceView(APIView):
             customer = Customer.objects.filter(user=user).first()
 
             # get all the policies of a customer
-            policies = TermsOfService.objects.filter(customer_linked=customer)
+            policies = TermsOfService.objects.filter(customer_linked=customer).order_by('-created_at')
             serializer =  TermsOfServiceConversionSerializer(policies, many=True)
             return Response(serializer.data, status=200)
         
@@ -169,7 +169,7 @@ class DataProcessisingAgreementView(APIView):
             customer = Customer.objects.filter(user=user).first()
 
             # get all the policies of a customer
-            policies = DataProcessingAgreement.objects.filter(customer_linked=customer)
+            policies = DataProcessingAgreement.objects.filter(customer_linked=customer).order_by("-created_at")
             serializer =  DataProcessingAgreementReadSerializer(policies, many=True)
             return Response(serializer.data, status=200)
         
@@ -216,7 +216,7 @@ class AcceptableUsePolicyView(APIView):
             customer = Customer.objects.filter(user=user).first()
 
             # get all the policies of a customer
-            policies = AcceptableUsePolicy.objects.filter(customer_linked=customer)
+            policies = AcceptableUsePolicy.objects.filter(customer_linked=customer).order_by("-created_at")
             serializer =  AcceptableUsePolicyReadSerializer(policies, many=True)
             return Response(serializer.data, status=200)
         
@@ -263,7 +263,7 @@ class CookiePolicyView(APIView):
             customer = Customer.objects.filter(user=user).first()
 
             # get all the policies of a customer
-            policies = CookiePolicy.objects.filter(customer_linked=customer)
+            policies = CookiePolicy.objects.filter(customer_linked=customer).order_by("-created_at")
             serializer =  CookiePolicyReadSerializer(policies, many=True)
             return Response(serializer.data, status=200)
         
