@@ -236,13 +236,6 @@ const Dashboard = () => {
       action: () => navigate('/display-policies'),
       color: '#8b5cf6'
     },
-    { 
-      icon: '⚙️', 
-      title: 'Account Settings', 
-      description: 'Manage your account',
-      action: () => alert('Settings coming soon!'),
-      color: '#6b7280'
-    }
   ];
 
   const getTimeAgo = (dateString) => {
