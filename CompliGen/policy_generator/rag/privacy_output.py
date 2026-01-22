@@ -103,7 +103,9 @@ class StructuredPrivacyPolicy(BaseModel):
 
     # Main sections
     sections: List[PolicySection] = Field(
-        ..., description="Main policy sections"
+        ...,  # ✅ REQUIRED! No default
+        min_length=13, 
+        description="Array of 13-14 main policy sections with section_number, heading, and content"
     )
 
     # Complaints and OAIC

@@ -163,7 +163,7 @@ def generate_terms_of_service(
     payment_terms="",
 ):
     today = datetime.now(ZoneInfo("Australia/Sydney"))
-    
+
     # Queries tuned for relevance
     legal_query = (
         "Australian Consumer Law consumer guarantees services major failure remedies "
@@ -278,7 +278,6 @@ def generate_terms_of_service(
             _strip_banned_phrases(item) 
             for item in section['content']
         ]
-    print(tos_dict)
     return tos_dict
 
 

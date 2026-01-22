@@ -127,7 +127,7 @@ def generate_acceptable_use_policy(
     reporting_illegal_activities: str,
 ):
     today = datetime.now(ZoneInfo("Australia/Sydney"))
-    
+
     # RAG: legal + examples
     legal_docs = vector_store.similarity_search(
         "acceptable use policy Australia platform misuse monitoring enforcement illegal activity reporting",
@@ -169,7 +169,6 @@ def generate_acceptable_use_policy(
     )
 
     result = chain.invoke({"input": prompt})
-    print(result.model_dump())
     return result.model_dump()
 
 """

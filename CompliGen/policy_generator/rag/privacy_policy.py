@@ -253,7 +253,6 @@ def generate_privacy_policy(
 
     # GENERATION STEP
     result = chain.invoke({"input": prompt})
-    print(result.model_dump())
     return result.model_dump()
 
 

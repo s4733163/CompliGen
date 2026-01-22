@@ -160,7 +160,7 @@ class DataProcessisingAgreementView(APIView):
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
 
         except Exception as e:
-            log_exception(logger, request, e, "DPA UnknownError")
+            return log_exception(logger, request, e, "DPA UnknownError")
           
     def get(self, request):
         try:

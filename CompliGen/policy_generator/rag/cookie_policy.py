@@ -364,6 +364,5 @@ def generate_cookie_policy(
 
     result = chain.invoke({"input": prompt})
     # the cookie policy can act strangely and give error.
-    print(result)
     return result.model_dump()
 

@@ -112,7 +112,11 @@ class StructuredCookiePolicy(BaseModel):
     cookie_types: List[str] = Field(..., description="Types of cookies used")
 
     # Sections
-    sections: List[CookieSection] = Field(..., description="Policy sections")
+    sections: List[CookieSection] = Field(
+        ...,  # ✅ REQUIRED! No default
+        min_length= 8,  # ✅ Must have at least 8 sections
+        description="Array of 8 policy sections with section_number, heading, and content"
+    )
 
     # Third-party services
     third_party_services: List[ThirdPartyService] = Field(
