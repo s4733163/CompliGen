@@ -10,32 +10,64 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from django.db import IntegrityError
+import traceback
+import logging
+
+logger = logging.getLogger(__name__)
+
+def log_exception(logger, request, exc, context):
+    logger.error(
+        f"{context} failed for user_id={request.user.id}",
+        exc_info=True,
+        extra={
+            "path": request.path,
+            "method": request.method,
+            "payload": request.data,
+        },
+    )
 
 
 class PrivacyPolicyView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
-            # get the customer and the data
             user = request.user
             data = request.data
             customer = Customer.objects.filter(user=user).first()
 
-            # generate the policy
             generated_policy = generate_privacy_policy(**data)
 
-            # save in the db
-            serializer = PrivacyPolicyCreateSerializer(data=generated_policy, context={"customer": customer})
+            serializer = PrivacyPolicyCreateSerializer(
+                data=generated_policy,
+                context={"customer": customer}
+            )
             serializer.is_valid(raise_exception=True)
             saved_obj = serializer.save()
 
-            # provide the id
             generated_policy["id"] = saved_obj.id
-
             return Response(generated_policy, status=200)
 
+        except IntegrityError as e:
+            log_exception(logger, request, e, "PrivacyPolicy IntegrityError")
+            return Response(
+                {"error": "Policy failed to generate. Please retry"},
+                status=500
+            )
+
+        except serializers.ValidationError as e:
+            log_exception(logger, request, e, "PrivacyPolicy ValidationError")
+            return Response(
+                {"error": "Policy failed to generate. Please retry"},
+                status=500
+            )
+
         except Exception as e:
-            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+            log_exception(logger, request, e, "PrivacyPolicy UnknownError")
+            return Response(
+                {"error": "Policy failed to generate. Please retry"},
+                status=500
+            )
         
     def get(self, request):
         try:
@@ -56,22 +88,32 @@ class TermsOfServiceView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
-            # get the customer and the data
             user = request.user
             data = request.data
             customer = Customer.objects.filter(user=user).first()
 
             generated_policy = generate_terms_of_service(**data)
 
-            serializer = TermsOfServiceSerializer(data=generated_policy, context={"customer": customer})
+            serializer = TermsOfServiceSerializer(
+                data=generated_policy,
+                context={"customer": customer}
+            )
             serializer.is_valid(raise_exception=True)
             saved_obj = serializer.save()
 
-            # provide the id
             generated_policy["id"] = saved_obj.id
-
             return Response(generated_policy, status=200)
+
+        except IntegrityError as e:
+            log_exception(logger, request, e, "ToS IntegrityError")
+            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+
+        except serializers.ValidationError as e:
+            log_exception(logger, request, e, "ToS ValidationError")
+            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+
         except Exception as e:
+            log_exception(logger, request, e, "ToS UnknownError")
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
         
     def get(self, request):
@@ -93,25 +135,33 @@ class DataProcessisingAgreementView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
-            # get the customer and the data
             user = request.user
             data = request.data
             customer = Customer.objects.filter(user=user).first()
 
             generated_policy = generate_data_processing_agreement(**data)
 
-            serializer = DataProcessingAgreementCreateSerializer(data=generated_policy, context={"customer": customer})
+            serializer = DataProcessingAgreementCreateSerializer(
+                data=generated_policy,
+                context={"customer": customer}
+            )
             serializer.is_valid(raise_exception=True)
             saved_obj = serializer.save()
 
-            # provide the id
             generated_policy["id"] = saved_obj.id
-
             return Response(generated_policy, status=200)
 
-        except Exception as e:
+        except IntegrityError as e:
+            log_exception(logger, request, e, "DPA IntegrityError")
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
-    
+
+        except serializers.ValidationError as e:
+            log_exception(logger, request, e, "DPA ValidationError")
+            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+
+        except Exception as e:
+            log_exception(logger, request, e, "DPA UnknownError")
+          
     def get(self, request):
         try:
             # get the customer
@@ -128,26 +178,37 @@ class DataProcessisingAgreementView(APIView):
 
 class AcceptableUsePolicyView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
         try:
-            # get the customer and the data
             user = request.user
             data = request.data
             customer = Customer.objects.filter(user=user).first()
 
             generated_policy = generate_acceptable_use_policy(**data)
 
-            serializer = AcceptableUsePolicyCreateSerializer(data=generated_policy, context={"customer": customer})
+            serializer = AcceptableUsePolicyCreateSerializer(
+                data=generated_policy,
+                context={"customer": customer}
+            )
             serializer.is_valid(raise_exception=True)
             saved_obj = serializer.save()
 
-            # provide the id
             generated_policy["id"] = saved_obj.id
-
             return Response(generated_policy, status=200)
-        except Exception as e:
+
+        except IntegrityError as e:
+            log_exception(logger, request, e, "AUP IntegrityError")
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
-    
+
+        except serializers.ValidationError as e:
+            log_exception(logger, request, e, "AUP ValidationError")
+            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+
+        except Exception as e:
+            log_exception(logger, request, e, "AUP UnknownError")
+            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+        
     def get(self, request):
         try:
             # get the customer
@@ -164,24 +225,35 @@ class AcceptableUsePolicyView(APIView):
 
 class CookiePolicyView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
         try:
-            # get the customer and the data
             user = request.user
             data = request.data
             customer = Customer.objects.filter(user=user).first()
 
             generated_policy = generate_cookie_policy(**data)
 
-            serializer = CookiePolicyCreateSerializer(data=generated_policy, context={"customer": customer})
+            serializer = CookiePolicyCreateSerializer(
+                data=generated_policy,
+                context={"customer": customer}
+            )
             serializer.is_valid(raise_exception=True)
             saved_obj = serializer.save()
 
-            # provide the id
             generated_policy["id"] = saved_obj.id
-
             return Response(generated_policy, status=200)
+
+        except IntegrityError as e:
+            log_exception(logger, request, e, "CookiePolicy IntegrityError")
+            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+
+        except serializers.ValidationError as e:
+            log_exception(logger, request, e, "CookiePolicy ValidationError")
+            return Response({"error": "Policy failed to generate. Please retry"}, status=500)
+
         except Exception as e:
+            log_exception(logger, request, e, "CookiePolicy UnknownError")
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
         
     def get(self, request):
