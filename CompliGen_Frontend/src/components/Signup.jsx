@@ -287,29 +287,33 @@ const Signup = () => {
                 <div className="auth-wrapper">
                     {/* Left Side - Branding */}
                     <div className="auth-branding">
-                        <div className="branding-content">
-                            <img src={image} alt="CompliGen Logo" className="branding-logo" />
-                            <h1 className="branding-title">CompliGen</h1>
-                            <p className="branding-subtitle">
-                                Join thousands of companies automating their compliance
-                            </p>
+                    <div className="branding-content">
+                        <img src={image} alt="CompliGen Logo" className="branding-logo" />
+                        <h1 className="branding-title">CompliGen</h1>
 
-                            <div className="branding-features">
-                                <div className="branding-feature">
-                                    <div className="feature-icon">✓</div>
-                                    <span>Instant compliance reports</span>
-                                </div>
-                                <div className="branding-feature">
-                                    <div className="feature-icon">✓</div>
-                                    <span>AI-powered policy generation</span>
-                                </div>
-                                <div className="branding-feature">
-                                    <div className="feature-icon">✓</div>
-                                    <span>Industry-standard frameworks</span>
-                                </div>
-                            </div>
+                        <p className="branding-subtitle">
+                        Generate legally sound policies in minutes — not weeks
+                        </p>
+
+                        <div className="branding-features">
+                        <div className="branding-feature">
+                            <div className="feature-icon">✓</div>
+                            <span>Privacy, Terms & policy generation</span>
+                        </div>
+
+                        <div className="branding-feature">
+                            <div className="feature-icon">✓</div>
+                            <span>Australian-law aligned documents</span>
+                        </div>
+
+                        <div className="branding-feature">
+                            <div className="feature-icon">✓</div>
+                            <span>Ready-to-download PDF policies</span>
+                        </div>
                         </div>
                     </div>
+                    </div>
+
 
                     {/* Right Side - Form */}
                     <div className="auth-form-section">

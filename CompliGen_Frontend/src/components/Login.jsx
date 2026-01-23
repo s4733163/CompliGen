@@ -112,7 +112,7 @@ const Login = () => {
                     // Store tokens in localStorage
                     localStorage.setItem('access_token', data.access);
                     localStorage.setItem('refresh_token', data.refresh);
-                    
+
                     // Optionally store user info if provided
                     if (data.user) {
                         localStorage.setItem('user', JSON.stringify(data.user));
@@ -150,15 +150,15 @@ const Login = () => {
     return (
         <>
             <Navbar />
-            
+
             {/* Toast Notification - Fixed Position */}
             {status && (
                 <div className={`status-message ${statusType}`}>
                     <svg className="status-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                         {statusType === 'success' ? (
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         ) : (
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                         )}
                     </svg>
                     <span>{status}</span>
@@ -175,19 +175,21 @@ const Login = () => {
                             <p className="branding-subtitle">
                                 Welcome back! Sign in to access your compliance dashboard
                             </p>
-                            
+
                             <div className="branding-features">
                                 <div className="branding-feature">
                                     <div className="feature-icon">✓</div>
-                                    <span>View your compliance reports</span>
+                                    <span>Privacy, Terms & policy generation</span>
                                 </div>
+
                                 <div className="branding-feature">
                                     <div className="feature-icon">✓</div>
-                                    <span>Generate new policies</span>
+                                    <span>Australian-law aligned documents</span>
                                 </div>
+
                                 <div className="branding-feature">
                                     <div className="feature-icon">✓</div>
-                                    <span>Track your progress</span>
+                                    <span>Ready-to-download PDF policies</span>
                                 </div>
                             </div>
                         </div>
@@ -200,8 +202,8 @@ const Login = () => {
                                 <h2 className="auth-title">Welcome back</h2>
                                 <p className="auth-description">
                                     Don't have an account?{' '}
-                                    <button 
-                                        onClick={() => navigate('/signup')} 
+                                    <button
+                                        onClick={() => navigate('/signup')}
                                         className="auth-link"
                                     >
                                         Sign up
@@ -286,22 +288,22 @@ const Login = () => {
                             {/* Additional Help Text */}
                             <p className="auth-footer-text" style={{ marginTop: '2rem' }}>
                                 By signing in, you agree to our{' '}
-                                <span 
+                                <span
                                     onClick={(e) => {
                                         e.preventDefault();
                                         navigate('/terms');
-                                    }} 
+                                    }}
                                     className="auth-footer-link"
                                     style={{ cursor: 'pointer' }}
                                 >
                                     Terms of Service
                                 </span>
                                 {' '}and{' '}
-                                <span 
+                                <span
                                     onClick={(e) => {
                                         e.preventDefault();
                                         navigate('/privacy');
-                                    }} 
+                                    }}
                                     className="auth-footer-link"
                                     style={{ cursor: 'pointer' }}
                                 >

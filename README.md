@@ -460,6 +460,177 @@ The RAG system ingests legal documents and policy examples to provide context fo
    - `regulation`: "ACL", "Privacy Act 1988", etc.
    - `jurisdiction`: "Australia"
 
+#### Document Organization and Naming Conventions
+
+The `PolicyGeneratorDocuments/` directory is organized into three main categories, each with specific naming requirements:
+
+**Directory Structure**:
+```
+PolicyGeneratorDocuments/
+├── Laws/                    # Australian legal documents and regulations
+├── examples/               # Real-world policy examples from companies
+│   ├── privacy_policies/
+│   ├── terms_of_service/
+│   ├── cookie_policy/
+│   ├── dpa/
+│   └── acceptable_use/
+└── policy_template/        # Template documents
+```
+
+#### 1. Laws Directory
+
+**Purpose**: Store Australian legal documents and regulations that provide the legal foundation for policy generation.
+
+**Naming Convention**: Use descriptive filenames that identify the regulation.
+
+**Examples**:
+- `Privacy_Act_1988.pdf`
+- `Consolidated_APP_guidelines.pdf`
+- `ACL_Compliance_and_enforcement_guide.pdf`
+- `Spam_Act_2003.pdf`
+- `legislation_telecommunications_code_of_practice_1997.pdf`
+
+**Metadata Added**:
+```python
+{
+    'doc_type': 'law',
+    'regulation': 'Privacy_Act_1988',  # Extracted from filename
+    'jurisdiction': 'Australia'
+}
+```
+
+#### 2. Examples Directory
+
+**Purpose**: Store real-world policy examples from Australian companies to guide AI generation with industry-specific language and structure.
+
+**Naming Convention**: `{Policy Type}_{Company Name}.pdf`
+
+**CRITICAL**: The policy type and company name MUST be separated by an underscore (`_`). The ingestion script parses filenames using `file_path.stem.split("_")`.
+
+**Supported Policy Types**:
+- `Privacy Policy` (e.g., `Privacy Policy_Canva.pdf`)
+- `Terms of use` (e.g., `Terms of use_Atlassian.pdf`)
+- `Cookies Policy` (e.g., `Cookies Policy_CommBank.pdf`)
+- `Data Processing Addendum` (e.g., `Data Processing Addendum_Company.pdf`)
+- `Acceptable Use Policy` (e.g., `Acceptable Use Policy_Company.pdf`)
+
+**Example Files**:
+
+Privacy Policies:
+```
+Privacy Policy_Atlassian.pdf
+Privacy Policy_Canva.pdf
+Privacy Policy_SEEK.pdf
+Privacy Policy_Telstra.pdf
+Privacy Policy_Woolworths Group.pdf
+```
+
+Terms of Service:
+```
+Terms of use_Atlassian.pdf
+Terms of use_Freelancer.pdf
+Terms of use_Xero AU.pdf
+Terms of use_canva.pdf
+```
+
+Cookie Policies:
+```
+Cookies Policy_Atlassian.pdf
+Cookies Policy_CommBank.pdf
+Cookies Policy_Relevance.pdf
+```
+
+**Metadata Added**:
+```python
+{
+    'doc_type': 'example',
+    'policy_type': 'Privacy Policy',  # From filename
+    'company': 'Canva'                # From filename
+}
+```
+
+**Important Notes**:
+- Policy types are case-sensitive and must match exactly
+- Company names can contain spaces (e.g., "Woolworths Group")
+- Files must be placed in the correct subdirectory (`privacy_policies/`, `terms_of_service/`, etc.)
+- The subdirectory must be nested under `examples/` (e.g., `examples/privacy_policies/`)
+
+#### 3. Policy Templates Directory
+
+**Purpose**: Store template documents that provide structural guidance for policy generation.
+
+**Naming Convention**: Use descriptive filenames that identify the template purpose.
+
+**Examples**:
+- `privacy-policy_template.pdf`
+- `privacy-management-plan-template-editable.pdf`
+
+**Metadata Added**:
+```python
+{
+    'doc_type': 'template',
+    'template_name': 'privacy-policy_template'  # From filename
+}
+```
+
+#### Adding New Documents
+
+To add new documents to the RAG system:
+
+1. **Determine Document Type**: Is it a law, example, or template?
+
+2. **Place in Correct Directory**:
+   - Laws → `PolicyGeneratorDocuments/Laws/`
+   - Examples → `PolicyGeneratorDocuments/examples/{policy_type}/`
+   - Templates → `PolicyGeneratorDocuments/policy_template/`
+
+3. **Name According to Convention**:
+   - Laws: `{Regulation_Name}.pdf`
+   - Examples: `{Policy Type}_{Company Name}.pdf`
+   - Templates: `{template-description}.pdf`
+
+4. **Run Ingestion Script**:
+   ```python
+   from policy_generator.rag.ingestion import ingest_documents
+   ingest_documents()
+   ```
+
+5. **Verify Ingestion**:
+   The script outputs progress for each file:
+   ```
+   [1] Processing: Privacy_Act_1988.pdf
+      ✓ Created 234 chunks from 89 pages
+   [2] Processing: Privacy Policy_Canva.pdf
+      ✓ Created 45 chunks from 12 pages
+   ```
+
+#### Common Naming Mistakes to Avoid
+
+❌ **Incorrect**:
+- `Canva Privacy Policy.pdf` (policy type should come first)
+- `PrivacyPolicy_Canva.pdf` (use spaces: "Privacy Policy")
+- `Privacy-Policy_Canva.pdf` (use spaces, not hyphens)
+- `privacy policy_canva.pdf` (incorrect capitalization)
+
+✅ **Correct**:
+- `Privacy Policy_Canva.pdf`
+- `Terms of use_Atlassian.pdf`
+- `Cookies Policy_CommBank.pdf`
+
+#### Troubleshooting File Ingestion
+
+**Issue**: Files are processed but metadata is incomplete
+- **Cause**: Filename doesn't match expected format
+- **Solution**: Rename file to match conventions exactly
+
+**Issue**: Files in `examples/` directory not categorized correctly
+- **Cause**: File not in proper subdirectory or policy type in filename doesn't match code
+- **Solution**: Ensure file is in `examples/{policy_type}/` and uses exact policy type strings
+
+**Issue**: Some example files don't appear in RAG results
+- **Cause**: ChromaDB may need to be rebuilt
+- **Solution**: Delete `chroma/` directory and re-run ingestion
+
 ### Policy Generation
 
 Each policy type has a dedicated generator that:
