@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import '../styling/AupOutput.css';
+import { useNavigate } from 'react-router-dom';
 
 const AupOutput = ({ policyData, loading }) => {
   const [copySuccess, setCopySuccess] = useState(false);
+  const navigate = useNavigate();
 
   // Check if policyData has the structured format (with sections array)
   const hasStructuredData = policyData && policyData.sections && Array.isArray(policyData.sections);
@@ -86,7 +88,7 @@ const AupOutput = ({ policyData, loading }) => {
         <div className="aup-output-actions">
           <button 
             className="aup-output-btn aup-output-btn-download"
-            onClick={handleDownloadPDF}
+            onClick={() => navigate('/aup')}
           >
             📄 Download PDF
           </button>

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import '../styling/AupOutput.css'; // Reusing AUP styles
+import { useNavigate } from 'react-router-dom';
 
 const DpaOutput = ({ policyData, loading }) => {
+  const navigate = useNavigate();
   const [copySuccess, setCopySuccess] = useState(false);
 
   const handleCopyToClipboard = () => {
@@ -82,7 +84,7 @@ const DpaOutput = ({ policyData, loading }) => {
         <div className="aup-output-actions">
           <button 
             className="aup-output-btn aup-output-btn-download"
-            onClick={handleDownloadPDF}
+            onClick={() => navigate('/dpa')}
           >
             📄 Download PDF
           </button>
