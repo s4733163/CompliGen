@@ -12,9 +12,9 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 load_dotenv()
 
 # Initialize embeddings model
-embeddings = GoogleGenerativeAIEmbeddings(
-    model="models/text-embedding-004",
-    google_api_key=os.environ.get("GOOGLE_API_KEY")
+embeddings = OpenAIEmbeddings(
+    model="text-embedding-3-small",  # Cost-effective and good quality
+    openai_api_key=os.environ.get("OPENAI_API_KEY")
 )
 
 # Initialize text splitter

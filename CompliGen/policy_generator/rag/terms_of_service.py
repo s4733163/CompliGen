@@ -6,6 +6,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from .policy_outputs import StructuredTermsOfService
+from langchain_openai import OpenAIEmbeddings
 
 # Load environment
 load_dotenv()
@@ -18,10 +19,10 @@ llm = ChatGoogleGenerativeAI(
     streaming=False,
 )
 
-# Initialize embeddings model
-embeddings = GoogleGenerativeAIEmbeddings(
-    model="models/text-embedding-004",
-    google_api_key=os.environ.get("GOOGLE_API_KEY"),
+
+embeddings = OpenAIEmbeddings(
+    model="text-embedding-3-small",  # Cost-effective and good quality
+    openai_api_key=os.environ.get("OPENAI_API_KEY")
 )
 
 # Initialise the vector store

@@ -6,6 +6,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGener
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from .policy_outputs import StructuredAcceptableUsePolicy
+from langchain_openai import OpenAIEmbeddings
 
 # -----------------------------
 # Setup (same as your pattern)
@@ -19,9 +20,9 @@ llm = ChatGoogleGenerativeAI(
     streaming=False,
 )
 
-embeddings = GoogleGenerativeAIEmbeddings(
-    model="models/text-embedding-004",
-    google_api_key=os.getenv("GOOGLE_API_KEY"),
+embeddings = OpenAIEmbeddings(
+    model="text-embedding-3-small",  # Cost-effective and good quality
+    openai_api_key=os.environ.get("OPENAI_API_KEY")
 )
 
 vector_store = Chroma(

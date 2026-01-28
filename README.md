@@ -80,7 +80,7 @@ CompliGen is a full-stack web application that enables Australian businesses to 
 |------------|---------|
 | LangChain | LLM orchestration |
 | ChromaDB | Vector database for embeddings |
-| Google Generative AI | Text embeddings (text-embedding-004) |
+| OpenAI | Text embeddings (text-embedding-3-small) |
 | Google Gemini | Policy generation (gemini-2.0-flash-exp) |
 | RAG | Retrieval-Augmented Generation |
 
@@ -186,6 +186,7 @@ CompliGen/
 - **Node.js**: 18.x or higher
 - **PostgreSQL**: 13 or higher
 - **Google API Key**: For Gemini AI access
+- **OpenAI API Key**: For text embeddings
 - **Gmail Account**: For email verification (app password required)
 
 ### Backend Setup
@@ -228,11 +229,13 @@ CompliGen/
    GMAIL=your_email@gmail.com
    GMAIL_PASSWORD=your_gmail_app_password
    GOOGLE_API_KEY=your_gemini_api_key
+   OPENAI_API_KEY=your_openai_api_key
    ```
 
    **Note**:
    - For Gmail app password, enable 2FA and generate an app password at [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
    - Get Gemini API key from [https://makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
+   - Get OpenAI API key from [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
 
 6. **Run database migrations**
    ```bash
@@ -453,7 +456,7 @@ The RAG system ingests legal documents and policy examples to provide context fo
 
 1. **Load Documents**: PDFs from `PolicyGeneratorDocuments/`
 2. **Chunk**: Split into 1000-character chunks with 200-character overlap
-3. **Embed**: Generate embeddings using Google `text-embedding-004`
+3. **Embed**: Generate embeddings using OpenAI `text-embedding-3-small`
 4. **Store**: Save in ChromaDB with metadata:
    - `doc_type`: "law", "example", "template"
    - `policy_type`: "terms_of_service", "privacy_policy", etc.
@@ -999,7 +1002,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - **LangChain**: For LLM orchestration framework
-- **Google**: For Gemini AI and embedding models
+- **Google**: For Gemini AI model
+- **OpenAI**: For text embedding models
 - **Django**: For robust backend framework
 - **React**: For modern frontend development
 - **Chroma**: For efficient vector storage
