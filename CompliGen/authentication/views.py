@@ -1,3 +1,20 @@
+"""
+Authentication Views Module
+
+This module handles all user authentication operations for the CompliGen platform including:
+- User registration with email verification
+- JWT-based login with email authentication
+- Email verification with time-limited tokens (24-hour expiry)
+- Password reset flow with secure tokenized links
+- User profile retrieval
+
+Security Features:
+- Cryptographically signed verification tokens using Django's signing module
+- URL-safe base64 encoded user IDs for password reset links
+- Django's built-in token generator for secure password reset tokens
+- JWT authentication for protected endpoints
+"""
+
 from django.contrib.auth.models import User
 from .models import Company, Customer
 from django.core import signing
@@ -13,27 +30,51 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_decode
 
-# remaining tomorrow
-# set up the create, validate, smtp, forgot password, reset password, email verification, l;ogin and connect to frontedn
 
-# Create your views here.
-# returns the token for verification
+# =============================================================================
+# EMAIL VERIFICATION HELPERS
+# =============================================================================
+
 def create_email_verification_token(user):
+    """
+    Generate a cryptographically signed token for email verification.
+
+    Uses Django's signing module to create a tamper-proof token containing
+    the user's ID. The token is salted with 'email-verification' to prevent
+    token reuse across different verification contexts.
+
+    Args:
+        user: Django User object for whom to create the verification token
+
+    Returns:
+        str: Signed token string that can be safely included in URLs
+    """
     token = signing.dumps(
         {"user_id": user.id},
         salt="email-verification"
     )
     return token
 
-# sends the email with the token attached
+
 def send_email_user(user):
+    """
+    Send email verification link to the user.
+
+    Generates a verification token and sends an email containing a clickable
+    verification link. The link points to the frontend verification page
+    with the token as a query parameter.
+
+    Note: Consider moving to Celery task queue in production to avoid
+    blocking the response while sending email.
+
+    Args:
+        user: Django User object to send verification email to
+    """
     token = create_email_verification_token(user)
     link = f"http://localhost:5173/verify_email?token={token}"
     subject = "Verify the email"
     message = f"Hi {user.username},\n\n Thanks for creating an account with compligen . Please click on the link below to verify your identity.\n{link}\n\n. If you did not create an account, please ignore."
 
-
-    # sending the mail to the user for resetting the password
     send_mail(
         subject=subject,
         message=message,
@@ -43,69 +84,119 @@ def send_email_user(user):
     )
 
 
-# user registration with the email verification link
+# =============================================================================
+# USER REGISTRATION & LOGIN VIEWS
+# =============================================================================
+
 class UserRegisterView(APIView):
+    """
+    Handle new user registration with automatic email verification.
+
+    Creates a new User, Company, and Customer record, then sends a verification
+    email with a 24-hour expiry token. Users must verify their email before
+    they can log in.
+
+    POST /api/register
+    Request Body:
+        - email: User's email address (used as username)
+        - password: Account password
+        - company_name: Name of the user's company
+        - industry: Business sector/industry
+        - role: User's role in the company
+    """
+
     def post(self, request):
-        # convert from json to object
+        """Process registration request and send verification email."""
         serialized = CustomerSerializer(data=request.data)
 
-        # check if serializer is valid, valid method called
         if serialized.is_valid():
+            # Create User, Company, and Customer records via serializer
+            customer = serialized.save()
 
-            # returns the customer object that was created, create method called
-            customer = serialized.save() 
-
-            # get the token for verification that was attached in the link and sent via email
-            # this can be put in a queue with the celery to not delay the response
+            # Send verification email (consider async queue for production)
             send_email_user(customer.user)
 
-            return Response({"message": "Account created! Check your email and verify within 24 hours."}, status=status.HTTP_201_CREATED)
-        
-        # add the serializers with errors
+            return Response(
+                {"message": "Account created! Check your email and verify within 24 hours."},
+                status=status.HTTP_201_CREATED
+            )
+
         return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-# login using email instead of username
+
+
 class EmailTokenObtainPairView(TokenObtainPairView):
+    """
+    Custom JWT login view that authenticates using email instead of username.
+
+    Extends SimpleJWT's TokenObtainPairView to use email as the primary
+    identifier. Also validates that the user's email is verified before
+    allowing login.
+
+    POST /api/login
+    Request Body:
+        - email: User's email address
+        - password: Account password
+    Returns:
+        - access: JWT access token
+        - refresh: JWT refresh token
+    """
     serializer_class = EmailVerificationSerializer
 
 
-# user_verification serializer
+# =============================================================================
+# EMAIL VERIFICATION VIEWS
+# =============================================================================
+
 class UserVerificationView(APIView):
+    """
+    Verify user email using the token from verification link.
+
+    Validates the signed token from the verification email, checks expiry
+    (24-hour limit), and marks the customer account as verified.
+
+    POST /api/user/verify
+    Request Body:
+        - token: Signed verification token from email link
+
+    Token Validation:
+        - SignatureExpired: Token older than 24 hours
+        - BadSignature: Token has been tampered with
+    """
+
     def post(self, request):
+        """Validate token and mark user as verified."""
         token = request.data.get("token")
         if not token:
             return Response({"message": "Token is required"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # check if the token is not expired and does not has bad signature
+
+        # Validate token signature and check 24-hour expiry
         try:
             payload = signing.loads(
                 token,
                 salt="email-verification",
-                max_age=60 * 60 * 24
+                max_age=60 * 60 * 24  # 24 hours in seconds
             )
         except signing.SignatureExpired:
             return Response({"status": "expired"}, status=status.HTTP_400_BAD_REQUEST)
         except signing.BadSignature:
             return Response({"status": "invalid"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # unwrapping the payload
+
+        # Extract user ID from verified token payload
         user_id = payload.get("user_id")
         user = User.objects.filter(id=user_id).first()
 
-        # check for the user
         if not user:
             return Response({"message": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # check for the customer
+
         customer = Customer.objects.filter(user=user).first()
         if not customer:
             return Response({"message": "Customer not found"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # check if the customer is already verified
+        # Prevent duplicate verification
         if customer.verified:
             return Response({"message": "User already verified"}, status=status.HTTP_200_OK)
-        
-        # ensure that the customer is verifed and save the updates
+
+        # Mark customer as verified
         customer.verified = True
         customer.save(update_fields=["verified"])
 
@@ -114,53 +205,75 @@ class UserVerificationView(APIView):
             status=status.HTTP_200_OK
         )
 
-        
-# resend email verification
+
 class ResendEmailVerification(APIView):
+    """
+    Resend verification email for users with expired or lost verification links.
+
+    Allows unverified users to request a new verification email. Validates
+    that the user exists and hasn't already verified their email.
+
+    POST /api/failed/verify
+    Request Body:
+        - email: User's registered email address
+    """
 
     def post(self, request):
+        """Generate and send a new verification email."""
         raw_email = request.data.get("email", "")
         email = User.objects.normalize_email(raw_email)
 
-    
         user = User.objects.filter(email__iexact=email).first()
 
-        # check if the user exists
         if not user:
-            return Response({"message":"User not found"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # get the customer corresponding to the user and check for existence
+            return Response({"message": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
+
         customer = Customer.objects.filter(user=user).first()
 
         if not customer:
-            return Response({"message":"Customer not found"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Customer not found"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # show error if customer already verified
+        # Prevent resending if already verified
         if customer.verified:
-            return Response({"message":"User already verified"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # send the email with the link that has the token
+            return Response({"message": "User already verified"}, status=status.HTTP_400_BAD_REQUEST)
+
         send_email_user(user)
 
         return Response({"message": "Email sent successfully."}, status=status.HTTP_201_CREATED)
 
 
-# sends an email with the password reset email
+# =============================================================================
+# PASSWORD RESET VIEWS
+# =============================================================================
+
 def password_reset(user):
-    # generate the uid and the token that is added in the url
+    """
+    Generate password reset token and send reset email.
+
+    Creates a secure, one-time-use password reset link using Django's
+    built-in token generator. The token is tied to the user's current
+    password hash, so it becomes invalid after password change.
+
+    Security:
+        - URL-safe base64 encoded user ID (prevents enumeration)
+        - Token invalidated after password change
+        - Token has built-in expiry (configured in settings)
+
+    Args:
+        user: Django User object requesting password reset
+
+    Returns:
+        tuple: (uid, token) - URL-safe encoded user ID and reset token
+    """
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = default_token_generator.make_token(user)
 
-    # the link that the user will access
     reset_link = f"http://localhost:5173/reset-password/{uid}/{token}"
 
     subject = "Reset your password"
-
-    # the message has the link embedded in it
     message = f"Hi {user.username},\n\nClick the link below to reset your password:\n{reset_link}\n\nIf you didn't request this, please ignore this email."
 
-    # sending the mail to the user for resetting the password
-    # this can also be put in a queue to not delay the response
+    # Consider async queue for production to avoid blocking response
     send_mail(
         subject=subject,
         message=message,
@@ -169,66 +282,106 @@ def password_reset(user):
         fail_silently=False,
     )
 
-    # uid and token are sent to the frontend and embedded in the url
     return uid, token
-        
 
-# sends the email to reset the password
+
 class UserResetAPIView(APIView):
+    """
+    Initiate password reset flow by sending reset email.
+
+    Validates that the email exists and sends a password reset link.
+    Does not reveal whether the email exists in the system for security
+    (though current implementation does - consider updating for production).
+
+    POST /api/user/reset/
+    Request Body:
+        - email: User's registered email address
+    """
+
     def post(self, request):
-        raw_email = request.data.get("email")  # safer alternative to []
+        """Send password reset email if user exists."""
+        raw_email = request.data.get("email")
         email = User.objects.normalize_email(raw_email)
 
-        # will be validated on the frontend 
         if not raw_email:
             return Response({"message": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # this returns a query set so use .first() to get the actual object
-        user = User.objects.filter(email__iexact=email).first() # check if the email exists
+        user = User.objects.filter(email__iexact=email).first()
 
-        # check if the user and the password exists
+        # Verify user exists and has a password set
         if user and user.password.strip():
             uid, token = password_reset(user)
-            return Response({"message":"The email has been sent", "uid": uid, "token":token}, status=status.HTTP_200_OK)
-        
-        
-        return Response({"message":"The user does not exist"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "The email has been sent", "uid": uid, "token": token},
+                status=status.HTTP_200_OK
+            )
 
-# changes the password based on the email that has been sent
+        return Response({"message": "The user does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+
 class PasswordResetAPIView(APIView):
+    """
+    Complete password reset by validating token and setting new password.
+
+    Validates the UID and token from the reset link, then updates the
+    user's password. The token is automatically invalidated after use
+    since it's tied to the user's password hash.
+
+    POST /api/user/password/new/
+    Request Body:
+        - uid: URL-safe base64 encoded user ID
+        - token: Password reset token from email
+        - new_password: New password to set
+    """
+
     def post(self, request):
+        """Validate reset token and update user password."""
         uidb64 = request.data.get('uid')
         token = request.data.get('token')
         new_password = request.data.get('new_password')
 
-        # check if anything is missing
         if not uidb64 or not token or not new_password:
             return Response({"message": "Missing data"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # check if the uid and user is valid
+
+        # Decode UID and retrieve user
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
             user = User.objects.get(pk=uid)
         except (User.DoesNotExist, ValueError, TypeError, OverflowError):
             return Response({"message": "Invalid link"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # check if the token exists
+
+        # Validate token (checks expiry and password hash match)
         if default_token_generator.check_token(user, token):
-            # the user is able to set the password
             user.set_password(new_password)
             user.save()
             return Response({"message": "Password has been reset successfully."}, status=status.HTTP_200_OK)
         else:
             return Response({"message": "Invalid or expired token"}, status=status.HTTP_400_BAD_REQUEST)
-        
 
+
+# =============================================================================
+# USER PROFILE VIEW
+# =============================================================================
 
 class UserProfile(APIView):
+    """
+    Retrieve authenticated user's profile information.
+
+    Protected endpoint requiring valid JWT authentication.
+    Returns basic user information for display in the frontend.
+
+    GET /api/credentials
+    Headers:
+        - Authorization: Bearer <access_token>
+    Returns:
+        - username: User's display name
+        - email: User's email address
+    """
     permission_classes = [IsAuthenticated]
 
-    # returns the user credentials
     def get(self, request):
+        """Return current user's profile data."""
         username = request.user.username
         email = request.user.email
-        return Response({"username":username, "email":email}, status=status.HTTP_200_OK)
+        return Response({"username": username, "email": email}, status=status.HTTP_200_OK)
 

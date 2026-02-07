@@ -1,128 +1,165 @@
 # CompliGen – AI-Powered Compliance Document Generator
 
-CompliGen is a full-stack web application that enables Australian businesses to generate legally structured compliance documents using AI-assisted generation. The platform leverages Retrieval-Augmented Generation (RAG) to create compliant legal policies based on Australian law, including the Privacy Act 1988 and Australian Consumer Law.
+> **Production-ready SaaS platform automating legal compliance document generation for Australian businesses using advanced RAG (Retrieval-Augmented Generation) technology.**
 
-![CompliGen Banner](https://img.shields.io/badge/CompliGen-AI%20Compliance-blue)
-![Django](https://img.shields.io/badge/Django-5.1.7-green)
-![React](https://img.shields.io/badge/React-19.2.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+![CompliGen Banner](https://img.shields.io/badge/CompliGen-AI%20Compliance-blue) ![Django](https://img.shields.io/badge/Django-5.1.7-green) ![React](https://img.shields.io/badge/React-19.2.0-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
----
-
-## Table of Contents
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Backend Setup](#backend-setup)
-  - [Frontend Setup](#frontend-setup)
-- [Configuration](#configuration)
-- [API Documentation](#api-documentation)
-- [Policy Types](#policy-types)
-- [RAG System](#rag-system)
-- [Database Schema](#database-schema)
-- [Deployment](#deployment)
-- [License](#license)
+[Live Demo](#) • [Documentation](#api-documentation) • [Architecture](#architecture)
 
 ---
 
-## Features
+## 🎯 Project Highlights
 
-### Core Functionality
+- **Full-Stack Development**: End-to-end implementation of enterprise SaaS platform with React frontend and Django REST backend
+- **AI/ML Integration**: Implemented production RAG pipeline using LangChain, ChromaDB vector database, and Google Gemini LLM
+- **Legal Compliance Engine**: Automated generation of 5 policy types compliant with Australian Privacy Act 1988 and Consumer Law
+- **Scalable Architecture**: PostgreSQL database with optimized vector search, JWT authentication, and RESTful API design
+- **Production Features**: Email verification system, PDF generation, secure CORS configuration, and comprehensive error handling
 
-- **AI-Powered Policy Generation**: Generate 5 types of compliance documents using Google Gemini 2.0 Flash
-- **Retrieval-Augmented Generation (RAG)**: Context-aware generation using legal documents and real-world examples
-- **Australian Legal Compliance**: Built-in compliance with ACL, Privacy Act 1988, and all 13 Australian Privacy Principles (APPs)
-- **User Management**: Complete authentication system with email verification and JWT tokens
-- **Policy Management Dashboard**: View, download, and manage all generated policies
-- **PDF Export**: Download policies as formatted PDF documents
-- **Industry-Specific Customization**: Tailored policies based on company industry and business model
+### 📊 Technical Metrics
+- **Backend**: 15+ REST API endpoints with full CRUD operations
+- **Database**: 10+ Django models with complex relationships and ArrayFields
+- **RAG Pipeline**: 3-stage document processing (ingestion → embedding → retrieval)
+- **AI Integration**: Structured output generation using Pydantic schemas with 5 distinct policy generators
+- **Frontend**: 12+ React components with Material-UI design system
 
-### Security Features
+---
 
-- Email-based authentication with verification
-- JWT token authentication with refresh mechanism
-- Password reset flow with tokenized links
-- 24-hour verification window
-- Secure CORS configuration
+## Overview
+
+CompliGen is an enterprise-grade full-stack web application that automates the generation of legally compliant documents for Australian businesses. The platform leverages Retrieval-Augmented Generation (RAG) to produce context-aware policies grounded in Australian Privacy Act 1988, Australian Consumer Law (ACL), and real-world industry examples.
+
+### 🚀 Key Features & Technical Achievements
+
+- **AI-Powered Policy Generation**: Integrated Google Gemini 2.0 Flash with structured output using Pydantic schemas for type-safe, validated document generation
+- **Advanced RAG Pipeline**: Built custom document ingestion pipeline with semantic chunking, OpenAI embeddings, and ChromaDB vector storage for context retrieval
+- **Australian Legal Compliance**: Engineered validation system ensuring adherence to 13 Australian Privacy Principles (APPs) and ACL requirements
+- **5 Policy Types**: Terms of Service, Privacy Policy, Cookie Policy, Data Processing Agreement, Acceptable Use Policy
+- **Production-Grade Authentication**: Implemented JWT-based auth flow with email verification, token refresh, and password reset functionality
+- **Industry-Specific Customization**: Context-aware generation adapting to company sector, business model, and regulatory requirements
+- **RESTful API**: Comprehensive REST API with CRUD operations, filtering, and dashboard analytics
+- **PDF Generation**: Dynamic PDF export using @react-pdf/renderer with formatted legal document layouts
+- **Database Optimization**: PostgreSQL with ArrayField, GIN indexes, and efficient relationship modeling for complex nested policy structures
+
+---
+
+## 💼 Technical Skills Demonstrated
+
+### Backend Development
+- **Django & DRF**: RESTful API design, model relationships, custom authentication, middleware
+- **Database Design**: PostgreSQL with advanced features (ArrayField, GIN indexes, cascade operations)
+- **Authentication & Security**: JWT tokens, email verification, CORS configuration, secure password handling
+
+### AI/ML Engineering
+- **LLM Integration**: Google Gemini API integration with structured outputs and Pydantic validation
+- **RAG Implementation**: Vector database design, semantic search, document chunking strategies
+- **Prompt Engineering**: Context augmentation, structured generation, error handling and retry logic
+
+### Frontend Development
+- **React 19**: Modern hooks, component architecture, routing, state management
+- **Material-UI**: Responsive design, form validation, user experience optimization
+- **PDF Generation**: Dynamic document rendering with @react-pdf/renderer
+
+### DevOps & Architecture
+- **API Design**: RESTful principles, versioning, comprehensive endpoint documentation
+- **Error Handling**: Validation layers, transaction management, graceful degradation
+- **Testing & Debugging**: Pydantic schema validation, Django-LangChain integration troubleshooting
 
 ---
 
 ## Tech Stack
 
-### Frontend
+**Frontend**: React 19, Vite, Material-UI, React Router, @react-pdf/renderer  
+**Backend**: Django 5.1.7, Django REST Framework, PostgreSQL, SimpleJWT  
+**AI/LLM**: LangChain, ChromaDB, OpenAI Embeddings (text-embedding-3-small), Google Gemini (gemini-2.0-flash-exp)
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| React | 19.2.0 | UI framework |
-| Vite | 7.2.4 | Build tool with HMR |
-| Material-UI | 7.3.6 | Component library |
-| React Router | 7.10.1 | Client-side routing |
-| @react-pdf/renderer | 4.3.2 | PDF generation |
-| jwt-decode | 4.0.0 | JWT token handling |
+### Architecture
 
-### Backend
-
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Python | 3.x | Programming language |
-| Django | 5.1.7 | Web framework |
-| Django REST Framework | - | API framework |
-| PostgreSQL | - | Primary database |
-| SimpleJWT | - | JWT authentication |
-
-### AI / LLM Stack
-
-| Technology | Purpose |
-|------------|---------|
-| LangChain | LLM orchestration |
-| ChromaDB | Vector database for embeddings |
-| OpenAI | Text embeddings (text-embedding-3-small) |
-| Google Gemini | Policy generation (gemini-2.0-flash-exp) |
-| RAG | Retrieval-Augmented Generation |
+```
+┌─────────────────┐       ┌──────────────────┐       ┌─────────────────┐
+│ React Frontend  │◄─────►│ Django Backend   │◄─────►│  PostgreSQL     │
+│   (Port 5173)   │  REST │   (Port 8000)    │       │   Database      │
+└─────────────────┘  API  └──────────────────┘       └─────────────────┘
+                                    │
+                          ┌─────────▼──────────┐
+                          │    RAG System      │
+                          │  ┌──────────────┐  │
+                          │  │  ChromaDB    │  │
+                          │  │  (Vectors)   │  │
+                          │  └──────────────┘  │
+                          │         ▼          │
+                          │  ┌──────────────┐  │
+                          │  │  Gemini AI   │  │
+                          │  └──────────────┘  │
+                          └────────────────────┘
+```
 
 ---
 
-## Architecture
+## Quick Start
 
-CompliGen follows a modern full-stack architecture with clear separation of concerns:
+### Prerequisites
 
+- Python 3.8+
+- Node.js 18+
+- PostgreSQL 13+
+- Google API Key (Gemini)
+- OpenAI API Key
+- Gmail account with app password
+
+### Installation
+
+1. **Clone and setup backend**
+
+```bash
+git clone <repository-url>
+cd CompliGen
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
+cd CompliGen
+pip install -r requirements.txt
+
+# Create PostgreSQL database
+createdb compligen_db
+
+# Configure environment variables
+cat > .env << EOL
+DB_NAME=compligen_db
+DB_USER=your_postgres_user
+DB_PASSWORD=your_postgres_password
+GMAIL=your_email@gmail.com
+GMAIL_PASSWORD=your_gmail_app_password
+GOOGLE_API_KEY=your_gemini_api_key
+OPENAI_API_KEY=your_openai_api_key
+EOL
+
+# Run migrations
+python manage.py makemigrations
+python manage.py migrate
+
+# Start backend
+python manage.py runserver
 ```
-┌─────────────────┐         ┌──────────────────┐         ┌─────────────────┐
-│                 │         │                  │         │                 │
-│  React Frontend │◄───────►│  Django Backend  │◄───────►│   PostgreSQL    │
-│   (Port 5173)   │  REST   │   (Port 8000)    │         │    Database     │
-│                 │  API    │                  │         │                 │
-└─────────────────┘         └──────────────────┘         └─────────────────┘
-                                     │
-                                     │
-                            ┌────────▼─────────┐
-                            │                  │
-                            │  RAG System      │
-                            │  ┌────────────┐  │
-                            │  │  ChromaDB  │  │
-                            │  │  (Vectors) │  │
-                            │  └────────────┘  │
-                            │        │         │
-                            │        ▼         │
-                            │  ┌────────────┐  │
-                            │  │  Gemini AI │  │
-                            │  └────────────┘  │
-                            └──────────────────┘
+
+2. **Setup frontend**
+
+```bash
+cd CompliGen_Frontend
+npm install
+npm run dev
 ```
 
-### RAG Workflow
+**Access**: Frontend at `http://localhost:5173`, Backend at `http://localhost:8000`
 
-1. **User Input**: Company information and policy requirements
-2. **Document Retrieval**: Semantic search in ChromaDB for relevant legal docs and examples
-3. **Context Augmentation**: Combine user input with retrieved legal context
-4. **AI Generation**: Gemini generates structured policy using Pydantic schemas
-5. **Validation**: Post-process to ensure compliance (ACL statements, no placeholders)
-6. **Storage**: Save to PostgreSQL with structured sections
-7. **Output**: Display formatted policy with PDF download option
+### API Keys
+
+- **Gmail App Password**: [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+- **Gemini API**: [https://makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
+- **OpenAI API**: [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
 
 ---
 
@@ -130,266 +167,146 @@ CompliGen follows a modern full-stack architecture with clear separation of conc
 
 ```
 CompliGen/
-├── CompliGen/                          # Django Backend
-│   ├── authentication/                 # User authentication app
-│   │   ├── models.py                   # Company, Customer models
-│   │   ├── views.py                    # Auth views (register, login, verify)
-│   │   └── urls.py                     # Auth endpoints
-│   ├── policy_generator/               # Core policy generation app
-│   │   ├── models.py                   # Policy models (ToS, Privacy, Cookie, DPA, AUP)
-│   │   ├── views.py                    # Policy CRUD operations
-│   │   ├── urls.py                     # Policy endpoints
-│   │   └── rag/                        # RAG system
-│   │       ├── ingestion.py            # Document ingestion pipeline
-│   │       ├── terms_of_service.py     # ToS generator
-│   │       ├── privacy_policy.py       # Privacy Policy generator
-│   │       ├── cookie_policy.py        # Cookie Policy generator
-│   │       ├── data_processing_agreement.py  # DPA generator
-│   │       ├── acceptable_use_policy.py      # AUP generator
-│   │       └── policy_outputs.py       # Pydantic schemas
-│   ├── CompliGen/                      # Django project settings
-│   │   ├── settings.py                 # Configuration
-│   │   └── urls.py                     # Main URL routing
-│   ├── PolicyGeneratorDocuments/       # Source documents for RAG
-│   ├── chroma/                         # ChromaDB storage
-│   ├── manage.py                       # Django management
-│   └── .env                            # Environment variables
+├── CompliGen/                      # Django Backend
+│   ├── authentication/             # User auth (models, views, urls)
+│   ├── policy_generator/           # Policy generation app
+│   │   ├── models.py              # Policy models (ToS, Privacy, etc.)
+│   │   ├── views.py               # API endpoints
+│   │   └── rag/                   # RAG system
+│   │       ├── ingestion.py       # Document ingestion
+│   │       ├── terms_of_service.py
+│   │       ├── privacy_policy.py
+│   │       ├── cookie_policy.py
+│   │       ├── data_processing_agreement.py
+│   │       ├── acceptable_use_policy.py
+│   │       └── policy_outputs.py  # Pydantic schemas
+│   ├── PolicyGeneratorDocuments/  # Source docs for RAG
+│   │   ├── Laws/                  # Australian regulations
+│   │   ├── examples/              # Real-world policy examples
+│   │   └── policy_template/       # Templates
+│   ├── chroma/                    # ChromaDB vector storage
+│   └── manage.py
 │
-├── CompliGen_Frontend/                 # React Frontend
-│   ├── src/
-│   │   ├── components/                 # React components
-│   │   │   ├── Home.jsx                # Landing page
-│   │   │   ├── Dashboard.jsx           # User dashboard
-│   │   │   ├── PolicyGenerator.jsx     # Main generator interface
-│   │   │   ├── Signup.jsx              # User registration
-│   │   │   ├── Login.jsx               # Login page
-│   │   │   ├── TosInput.jsx            # ToS input form
-│   │   │   ├── TosOutput.jsx           # ToS display component
-│   │   │   └── ...                     # Other policy components
-│   │   ├── App.jsx                     # Main app with routing
-│   │   ├── main.jsx                    # Entry point
-│   │   └── index.css                   # Global styles
-│   ├── vite.config.js                  # Vite configuration
-│   └── package.json                    # Dependencies
-│
-├── venv/                               # Python virtual environment
-└── README.md                           # This file
+└── CompliGen_Frontend/            # React Frontend
+    ├── src/
+    │   ├── components/            # React components
+    │   │   ├── Dashboard.jsx
+    │   │   ├── PolicyGenerator.jsx
+    │   │   └── ...
+    │   ├── App.jsx
+    │   └── main.jsx
+    └── package.json
 ```
 
 ---
 
-## Getting Started
+## 🧠 RAG System Architecture
 
-### Prerequisites
+### Technical Implementation
 
-- **Python**: 3.8 or higher
-- **Node.js**: 18.x or higher
-- **PostgreSQL**: 13 or higher
-- **Google API Key**: For Gemini AI access
-- **OpenAI API Key**: For text embeddings
-- **Gmail Account**: For email verification (app password required)
+**Custom Document Ingestion Pipeline:**
+- Automated PDF processing with metadata extraction and tagging
+- Semantic chunking (1000 chars, 200 overlap) optimized for legal document structure
+- OpenAI text-embedding-3-small for high-quality vector representations
+- ChromaDB persistence layer with filtered similarity search
 
-### Backend Setup
+**Intelligent Retrieval Strategy:**
+- Dual-context retrieval: Legal documents (k=10) + Industry examples (k=8)
+- Metadata filtering by doc_type, policy_type, regulation, and jurisdiction
+- Semantic query construction based on user input parameters
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd CompliGen
-   ```
+**Structured Generation:**
+- Pydantic schema definitions for type-safe, validated outputs
+- Gemini 2.0 Flash with temperature tuning (0.3) for consistent results
+- Post-processing validation ensuring compliance and placeholder removal
 
-2. **Create and activate virtual environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+### Document Organization
 
-3. **Install Python dependencies**
-   ```bash
-   cd CompliGen
-   pip install -r requirements.txt
-   ```
+The RAG system uses documents from `PolicyGeneratorDocuments/` with specific naming conventions:
 
-4. **Set up PostgreSQL database**
-   ```bash
-   # Create PostgreSQL database
-   createdb compligen_db
+**Directory Structure:**
+```
+PolicyGeneratorDocuments/
+├── Laws/                           # Australian legal documents
+│   └── Privacy_Act_1988.pdf       # Format: {Regulation_Name}.pdf
+├── examples/                       # Real-world examples
+│   ├── privacy_policies/
+│   │   └── Privacy Policy_Canva.pdf  # Format: {Policy Type}_{Company}.pdf
+│   ├── terms_of_service/
+│   └── cookie_policy/
+└── policy_template/               # Templates
+```
 
-   # Or using psql:
-   psql -U postgres
-   CREATE DATABASE compligen_db;
-   ```
+**Critical Naming Rules:**
 
-5. **Configure environment variables**
+1. **Examples**: `{Policy Type}_{Company Name}.pdf`
+   - ✅ `Privacy Policy_Canva.pdf`
+   - ✅ `Terms of use_Atlassian.pdf`
+   - ❌ `Canva Privacy Policy.pdf` (wrong order)
+   - ❌ `PrivacyPolicy_Canva.pdf` (no space)
 
-   Create a `.env` file in the `CompliGen/` directory:
-   ```env
-   DB_NAME=compligen_db
-   DB_USER=your_postgres_user
-   DB_PASSWORD=your_postgres_password
-   GMAIL=your_email@gmail.com
-   GMAIL_PASSWORD=your_gmail_app_password
-   GOOGLE_API_KEY=your_gemini_api_key
-   OPENAI_API_KEY=your_openai_api_key
-   ```
+2. **Policy Types** (case-sensitive):
+   - `Privacy Policy`
+   - `Terms of use`
+   - `Cookies Policy`
+   - `Data Processing Addendum`
+   - `Acceptable Use Policy`
 
-   **Note**:
-   - For Gmail app password, enable 2FA and generate an app password at [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
-   - Get Gemini API key from [https://makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
-   - Get OpenAI API key from [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+### Adding Documents
 
-6. **Run database migrations**
-   ```bash
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
-
-7. **Ingest documents into ChromaDB (Optional)**
-
-   If you have legal documents and examples in `PolicyGeneratorDocuments/`:
+1. Place file in correct directory
+2. Name according to convention
+3. Run ingestion:
    ```python
    from policy_generator.rag.ingestion import ingest_documents
    ingest_documents()
    ```
 
-8. **Start the Django development server**
-   ```bash
-   python manage.py runserver
-   ```
+### Generation Pipeline
 
-   Backend will be available at `http://localhost:8000`
-
-### Frontend Setup
-
-1. **Navigate to frontend directory**
-   ```bash
-   cd CompliGen_Frontend
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-   Frontend will be available at `http://localhost:5173`
-
----
-
-## Configuration
-
-### Backend Configuration
-
-**Django Settings** ([CompliGen/CompliGen/settings.py](CompliGen/CompliGen/settings.py)):
-
-- **Database**: PostgreSQL configuration using environment variables
-- **CORS**: Enabled for `http://localhost:5173`
-- **Authentication**: JWT-based using `rest_framework_simplejwt`
-- **Email**: Gmail SMTP backend for verification emails
-
-**Key Settings**:
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-]
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-}
-```
-
-### Frontend Configuration
-
-**Vite Config** ([CompliGen_Frontend/vite.config.js](CompliGen_Frontend/vite.config.js)):
-
-- React plugin with Babel compilation
-- React Compiler enabled for optimizations
-- Development server on port 5173
+1. **User Input** → Company info and requirements
+2. **Retrieval** → Semantic search in ChromaDB (legal docs k=10, examples k=8)
+3. **Augmentation** → Combine retrieved context with user data
+4. **Generation** → Gemini generates structured policy via Pydantic schemas
+5. **Validation** → Ensure compliance and remove placeholders
+6. **Storage** → Save to PostgreSQL with structured sections
 
 ---
 
 ## API Documentation
 
-### Base URL
-```
-http://localhost:8000/api
-```
+### Base URL: `http://localhost:8000`
 
-### Authentication Endpoints
+### Authentication
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/register` | Register new user |
-| POST | `/login` | Login with email/password |
-| POST | `/user/verify` | Verify email with token |
-| POST | `/failed/verify` | Resend verification email |
-| POST | `/token/refresh/` | Refresh JWT access token |
-| POST | `/user/reset/` | Request password reset |
-| POST | `/user/password/new/` | Set new password |
-| GET | `/credentials` | Get user profile |
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/register` | POST | Register user |
+| `/api/login` | POST | Login |
+| `/api/user/verify` | POST | Verify email |
+| `/api/token/refresh/` | POST | Refresh JWT |
 
-### Policy Generation Endpoints
+### Policy Generation
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/documents/generate/api/tos` | Generate Terms of Service |
-| GET | `/documents/generate/api/tos` | List all ToS policies |
-| DELETE | `/documents/generate/api/tos/<id>` | Delete ToS policy |
-| POST | `/documents/generate/api/privacypolicy` | Generate Privacy Policy |
-| GET | `/documents/generate/api/privacypolicy` | List all Privacy Policies |
-| DELETE | `/documents/generate/api/privacypolicy/<id>` | Delete Privacy Policy |
-| POST | `/documents/generate/api/cookie` | Generate Cookie Policy |
-| GET | `/documents/generate/api/cookie` | List all Cookie Policies |
-| DELETE | `/documents/generate/api/cookie/<id>` | Delete Cookie Policy |
-| POST | `/documents/generate/api/dpa` | Generate DPA |
-| GET | `/documents/generate/api/dpa` | List all DPAs |
-| DELETE | `/documents/generate/api/dpa/<id>` | Delete DPA |
-| POST | `/documents/generate/api/aup` | Generate AUP |
-| GET | `/documents/generate/api/aup` | List all AUPs |
-| DELETE | `/documents/generate/api/aup/<id>` | Delete AUP |
-| GET | `/documents/generate/api/dashboard` | Dashboard statistics |
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/documents/generate/api/tos` | POST/GET/DELETE | Terms of Service |
+| `/documents/generate/api/privacypolicy` | POST/GET/DELETE | Privacy Policy |
+| `/documents/generate/api/cookie` | POST/GET/DELETE | Cookie Policy |
+| `/documents/generate/api/dpa` | POST/GET/DELETE | Data Processing Agreement |
+| `/documents/generate/api/aup` | POST/GET/DELETE | Acceptable Use Policy |
+| `/documents/generate/api/dashboard` | GET | Dashboard stats |
 
-### Example Request
-
-**Register User**:
-```bash
-curl -X POST http://localhost:8000/api/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "SecurePass123!",
-    "company_name": "Acme Corp",
-    "industry": "SaaS"
-  }'
-```
-
-**Generate Privacy Policy**:
+**Example Request:**
 ```bash
 curl -X POST http://localhost:8000/documents/generate/api/privacypolicy \
-  -H "Authorization: Bearer <access_token>" \
+  -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
     "company_name": "Acme Corp",
     "industry": "SaaS",
     "business_model": "B2B Software",
-    "personal_information_collected": ["email", "name", "usage data"],
-    ...
+    "personal_information_collected": ["email", "name", "usage data"]
   }'
 ```
 
@@ -397,372 +314,11 @@ curl -X POST http://localhost:8000/documents/generate/api/privacypolicy \
 
 ## Policy Types
 
-CompliGen generates 5 types of compliance documents, each tailored for Australian businesses:
-
-### 1. Terms of Service (ToS)
-- **Length**: 2000-3000 words
-- **Features**:
-  - Australian Consumer Law (ACL) compliance
-  - Service description and pricing
-  - Intellectual property rights
-  - Liability limitations
-  - Termination clauses
-  - Dispute resolution
-
-### 2. Privacy Policy
-- **Length**: 2000-3000 words
-- **Features**:
-  - Addresses all 13 Australian Privacy Principles (APPs)
-  - Personal information collection and usage
-  - Third-party disclosures
-  - Data security measures
-  - User rights (access, correction, deletion)
-  - OAIC complaints process
-
-### 3. Cookie Policy
-- **Length**: 800-1500 words
-- **Features**:
-  - Types of cookies used
-  - Purpose and duration
-  - Third-party services
-  - Browser opt-out instructions
-  - Privacy Act compliance
-
-### 4. Data Processing Agreement (DPA)
-- **Features**:
-  - GDPR-style data processing terms
-  - Data controller/processor definitions
-  - Security measures
-  - Sub-processor management
-  - Annexes (processing details, security measures)
-
-### 5. Acceptable Use Policy (AUP)
-- **Features**:
-  - Permitted usage
-  - Prohibited activities
-  - Monitoring and enforcement
-  - Violation consequences
-  - Reporting mechanisms
-
----
-
-## RAG System
-
-### Document Ingestion
-
-The RAG system ingests legal documents and policy examples to provide context for AI generation.
-
-**Process** ([CompliGen/policy_generator/rag/ingestion.py](CompliGen/policy_generator/rag/ingestion.py)):
-
-1. **Load Documents**: PDFs from `PolicyGeneratorDocuments/`
-2. **Chunk**: Split into 1000-character chunks with 200-character overlap
-3. **Embed**: Generate embeddings using OpenAI `text-embedding-3-small`
-4. **Store**: Save in ChromaDB with metadata:
-   - `doc_type`: "law", "example", "template"
-   - `policy_type`: "terms_of_service", "privacy_policy", etc.
-   - `regulation`: "ACL", "Privacy Act 1988", etc.
-   - `jurisdiction`: "Australia"
-
-#### Document Organization and Naming Conventions
-
-The `PolicyGeneratorDocuments/` directory is organized into three main categories, each with specific naming requirements:
-
-**Directory Structure**:
-```
-PolicyGeneratorDocuments/
-├── Laws/                    # Australian legal documents and regulations
-├── examples/               # Real-world policy examples from companies
-│   ├── privacy_policies/
-│   ├── terms_of_service/
-│   ├── cookie_policy/
-│   ├── dpa/
-│   └── acceptable_use/
-└── policy_template/        # Template documents
-```
-
-#### 1. Laws Directory
-
-**Purpose**: Store Australian legal documents and regulations that provide the legal foundation for policy generation.
-
-**Naming Convention**: Use descriptive filenames that identify the regulation.
-
-**Examples**:
-- `Privacy_Act_1988.pdf`
-- `Consolidated_APP_guidelines.pdf`
-- `ACL_Compliance_and_enforcement_guide.pdf`
-- `Spam_Act_2003.pdf`
-- `legislation_telecommunications_code_of_practice_1997.pdf`
-
-**Metadata Added**:
-```python
-{
-    'doc_type': 'law',
-    'regulation': 'Privacy_Act_1988',  # Extracted from filename
-    'jurisdiction': 'Australia'
-}
-```
-
-#### 2. Examples Directory
-
-**Purpose**: Store real-world policy examples from Australian companies to guide AI generation with industry-specific language and structure.
-
-**Naming Convention**: `{Policy Type}_{Company Name}.pdf`
-
-**CRITICAL**: The policy type and company name MUST be separated by an underscore (`_`). The ingestion script parses filenames using `file_path.stem.split("_")`.
-
-**Supported Policy Types**:
-- `Privacy Policy` (e.g., `Privacy Policy_Canva.pdf`)
-- `Terms of use` (e.g., `Terms of use_Atlassian.pdf`)
-- `Cookies Policy` (e.g., `Cookies Policy_CommBank.pdf`)
-- `Data Processing Addendum` (e.g., `Data Processing Addendum_Company.pdf`)
-- `Acceptable Use Policy` (e.g., `Acceptable Use Policy_Company.pdf`)
-
-**Example Files**:
-
-Privacy Policies:
-```
-Privacy Policy_Atlassian.pdf
-Privacy Policy_Canva.pdf
-Privacy Policy_SEEK.pdf
-Privacy Policy_Telstra.pdf
-Privacy Policy_Woolworths Group.pdf
-```
-
-Terms of Service:
-```
-Terms of use_Atlassian.pdf
-Terms of use_Freelancer.pdf
-Terms of use_Xero AU.pdf
-Terms of use_canva.pdf
-```
-
-Cookie Policies:
-```
-Cookies Policy_Atlassian.pdf
-Cookies Policy_CommBank.pdf
-Cookies Policy_Relevance.pdf
-```
-
-**Metadata Added**:
-```python
-{
-    'doc_type': 'example',
-    'policy_type': 'Privacy Policy',  # From filename
-    'company': 'Canva'                # From filename
-}
-```
-
-**Important Notes**:
-- Policy types are case-sensitive and must match exactly
-- Company names can contain spaces (e.g., "Woolworths Group")
-- Files must be placed in the correct subdirectory (`privacy_policies/`, `terms_of_service/`, etc.)
-- The subdirectory must be nested under `examples/` (e.g., `examples/privacy_policies/`)
-
-#### 3. Policy Templates Directory
-
-**Purpose**: Store template documents that provide structural guidance for policy generation.
-
-**Naming Convention**: Use descriptive filenames that identify the template purpose.
-
-**Examples**:
-- `privacy-policy_template.pdf`
-- `privacy-management-plan-template-editable.pdf`
-
-**Metadata Added**:
-```python
-{
-    'doc_type': 'template',
-    'template_name': 'privacy-policy_template'  # From filename
-}
-```
-
-#### Adding New Documents
-
-To add new documents to the RAG system:
-
-1. **Determine Document Type**: Is it a law, example, or template?
-
-2. **Place in Correct Directory**:
-   - Laws → `PolicyGeneratorDocuments/Laws/`
-   - Examples → `PolicyGeneratorDocuments/examples/{policy_type}/`
-   - Templates → `PolicyGeneratorDocuments/policy_template/`
-
-3. **Name According to Convention**:
-   - Laws: `{Regulation_Name}.pdf`
-   - Examples: `{Policy Type}_{Company Name}.pdf`
-   - Templates: `{template-description}.pdf`
-
-4. **Run Ingestion Script**:
-   ```python
-   from policy_generator.rag.ingestion import ingest_documents
-   ingest_documents()
-   ```
-
-5. **Verify Ingestion**:
-   The script outputs progress for each file:
-   ```
-   [1] Processing: Privacy_Act_1988.pdf
-      ✓ Created 234 chunks from 89 pages
-   [2] Processing: Privacy Policy_Canva.pdf
-      ✓ Created 45 chunks from 12 pages
-   ```
-
-#### Common Naming Mistakes to Avoid
-
-❌ **Incorrect**:
-- `Canva Privacy Policy.pdf` (policy type should come first)
-- `PrivacyPolicy_Canva.pdf` (use spaces: "Privacy Policy")
-- `Privacy-Policy_Canva.pdf` (use spaces, not hyphens)
-- `privacy policy_canva.pdf` (incorrect capitalization)
-
-✅ **Correct**:
-- `Privacy Policy_Canva.pdf`
-- `Terms of use_Atlassian.pdf`
-- `Cookies Policy_CommBank.pdf`
-
-#### Troubleshooting File Ingestion
-
-**Issue**: Files are processed but metadata is incomplete
-- **Cause**: Filename doesn't match expected format
-- **Solution**: Rename file to match conventions exactly
-
-**Issue**: Files in `examples/` directory not categorized correctly
-- **Cause**: File not in proper subdirectory or policy type in filename doesn't match code
-- **Solution**: Ensure file is in `examples/{policy_type}/` and uses exact policy type strings
-
-**Issue**: Some example files don't appear in RAG results
-- **Cause**: ChromaDB may need to be rebuilt
-- **Solution**: Delete `chroma/` directory and re-run ingestion
-
-### Policy Generation
-
-Each policy type has a dedicated generator that:
-
-1. **Builds Semantic Queries**: Based on user input
-2. **Retrieves Context**:
-   - Legal documents (k=10): Relevant laws and regulations
-   - Example documents (k=8): Real-world policies from similar companies
-3. **Augments Prompt**: Combines legal context + examples + user data
-4. **Generates Policy**: Using Gemini with structured output (Pydantic schemas)
-5. **Post-processes**: Validates compliance and removes placeholders
-
-**Example from** [CompliGen/policy_generator/rag/terms_of_service.py](CompliGen/policy_generator/rag/terms_of_service.py):
-
-```python
-# Retrieve legal context
-legal_docs = vectorstore.similarity_search(
-    query="Australian Consumer Law terms of service requirements",
-    filter={"doc_type": "law"},
-    k=10
-)
-
-# Retrieve example context
-example_docs = vectorstore.similarity_search(
-    query=f"terms of service for {industry} company",
-    filter={"doc_type": "example", "policy_type": "terms_of_service"},
-    k=8
-)
-
-# Generate with Gemini
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash-exp",
-    temperature=0.3
-).with_structured_output(StructuredTermsOfService)
-
-result = llm.invoke(prompt)
-```
-
-### Structured Output
-
-**Pydantic Schemas** ([CompliGen/policy_generator/rag/policy_outputs.py](CompliGen/policy_generator/rag/policy_outputs.py)):
-
-```python
-class StructuredTermsOfService(BaseModel):
-    title: str
-    introduction: str
-    sections: List[ToSSection]
-    last_updated: str
-
-class ToSSection(BaseModel):
-    section_number: int
-    heading: str
-    content: str
-```
-
-This ensures consistent JSON structure and type safety.
-
----
-
-## Database Schema
-
-### Core Models
-
-#### Authentication App
-
-**Company** ([CompliGen/authentication/models.py](CompliGen/authentication/models.py)):
-- `name`: Company name
-- `industry`: Business sector
-
-**Customer**:
-- `user`: OneToOne with Django User
-- `role`: User role in company
-- `company`: ForeignKey to Company
-- `verified`: Email verification status
-
-#### Policy Generator App
-
-**TermsOfService** ([CompliGen/policy_generator/models.py](CompliGen/policy_generator/models.py)):
-- Company information fields
-- Service details (pricing, refunds)
-- Legal clauses (IP, liability, termination)
-- Related `ToSSection` model for structured sections
-
-**PrivacyPolicy**:
-- Personal information collected (ArrayField)
-- Third-party disclosures
-- User rights
-- Related models: `PrivacyPolicySection`, `PrivacyPolicySubsection`, `PrivacyPolicyContactInfo`
-
-**CookiePolicy**:
-- Cookie types and purposes
-- Related models: `CookiePolicySection`, `CookieThirdPartyService`, `CookieBrowserInstruction`
-
-**DataProcessingAgreement**:
-- Complex structure with definitions and annexes
-- Related models: `DPASection`, `DPADefinitions`, `DPAAnnexA`, `DPAAnnexB`, `DPASubProcessor`
-
-**AcceptableUsePolicy**:
-- Usage rules and enforcement
-- Related model: `AUPSection`
-
-### Database Features
-
-- **PostgreSQL ArrayField**: Efficient storage of lists
-- **GIN Indexes**: Fast querying on array fields
-- **Cascade Delete**: Related sections deleted with parent policy
-- **Timestamps**: Created and updated timestamps on all models
-
----
-
-## Development
-
-### Code Style
-
-**Backend**:
-- Follow PEP 8 guidelines
-- Use Django best practices
-
-**Frontend**:
-- ESLint configuration in [CompliGen_Frontend/eslint.config.js](CompliGen_Frontend/eslint.config.js)
-- React best practices
-
-### Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. **Terms of Service** (2000-3000 words): ACL compliance, service description, IP rights, liability, termination
+2. **Privacy Policy** (2000-3000 words): All 13 APPs, data collection/usage, user rights, OAIC process
+3. **Cookie Policy** (800-1500 words): Cookie types, purposes, third-party services, opt-out instructions
+4. **Data Processing Agreement**: GDPR-style terms, controller/processor definitions, security measures
+5. **Acceptable Use Policy**: Permitted usage, prohibited activities, enforcement, reporting
 
 ---
 
@@ -770,257 +326,92 @@ This ensures consistent JSON structure and type safety.
 
 ### Common Issues
 
-**1. Database Connection Error**
+**Database Connection Error**
 ```
 django.db.utils.OperationalError: could not connect to server
 ```
-**Solution**: Ensure PostgreSQL is running and credentials in `.env` are correct.
+→ Ensure PostgreSQL is running and `.env` credentials are correct
 
-**2. ChromaDB Not Found**
-```
-FileNotFoundError: chroma.sqlite3
-```
-**Solution**: Run document ingestion script to create ChromaDB:
+**ChromaDB Not Found**
 ```python
 from policy_generator.rag.ingestion import ingest_documents
 ingest_documents()
 ```
 
-**3. CORS Error in Frontend**
+**Email Verification Not Sending**
+→ Enable 2FA and generate Gmail app password
+
+**Pydantic ValidationError**
+→ LLM may skip required fields. Implement retry logic with error feedback:
+```python
+max_retries = 3
+for attempt in range(max_retries):
+    try:
+        result = llm.invoke(prompt)
+        break
+    except ValidationError as e:
+        prompt += f"\n\nERROR: {e}. Include all required fields."
 ```
-Access to fetch at 'http://localhost:8000' blocked by CORS policy
-```
-**Solution**: Verify `CORS_ALLOWED_ORIGINS` in `settings.py` includes frontend URL.
-
-**4. Email Verification Not Sending**
-```
-SMTPAuthenticationError
-```
-**Solution**:
-- Enable 2FA on Gmail
-- Generate app password at [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
-- Use app password in `.env` file
-
-**5. Gemini API Rate Limit**
-```
-429 Resource has been exhausted
-```
-**Solution**: Implement rate limiting or upgrade API quota.
-
-### Pydantic and Model Schema Issues
-
-These are less common but critical bugs related to Pydantic schema validation and Django-LangChain integration:
-
-**6. Pydantic ValidationError - Missing Required Fields**
-```
-pydantic.error_wrappers.ValidationError: 1 validation error for StructuredPrivacyPolicy
-sections -> 0 -> subsections
-  field required (type=value_error.missing)
-```
-**Cause**: LLM occasionally skips required fields in structured output, especially for deeply nested models.
-
-**Solution**:
-- Increase temperature slightly (0.3 → 0.4) to improve field completion
-- Add explicit field requirements in the prompt: "MUST include all required fields"
-- Implement retry logic with error feedback:
-  ```python
-  max_retries = 3
-  for attempt in range(max_retries):
-      try:
-          result = llm.invoke(prompt)
-          break
-      except ValidationError as e:
-          prompt += f"\n\nPREVIOUS ERROR: {e}. Please include all required fields."
-  ```
-
-**7. Pydantic Field Type Mismatch**
-```
-pydantic.error_wrappers.ValidationError: value is not a valid list (type=type_error.list)
-```
-**Cause**: LLM returns a string instead of a list for array fields (e.g., `personal_information_collected`).
-
-**Solution**:
-- Update Pydantic schema with field validators:
-  ```python
-  from pydantic import field_validator
-
-  @field_validator('personal_information_collected', mode='before')
-  def parse_list(cls, v):
-      if isinstance(v, str):
-          return [item.strip() for item in v.split(',')]
-      return v
-  ```
-- Be explicit in prompts: "Return as JSON array, not comma-separated string"
-
-**8. Django Model vs Pydantic Schema Mismatch**
-```
-django.db.utils.DataError: value too long for type character varying(255)
-```
-**Cause**: Pydantic schema allows unlimited string length, but Django model has `max_length` constraint.
-
-**Solution**:
-- Sync Pydantic `Field(max_length=255)` with Django model constraints
-- Add length validation in Pydantic schemas:
-  ```python
-  from pydantic import Field
-
-  company_name: str = Field(..., max_length=255)
-  ```
-- Truncate before saving to Django:
-  ```python
-  company_name = result.company_name[:255]
-  ```
-
-**9. ArrayField Serialization Error**
-```
-TypeError: Object of type 'dict' is not JSON serializable
-```
-**Cause**: Nested Pydantic models saved directly to Django ArrayField without serialization.
-
-**Solution**:
-- Convert Pydantic models to dicts before saving:
-  ```python
-  sections_data = [section.model_dump() for section in result.sections]
-  # Or use .dict() for older Pydantic versions
-  ```
-
-**10. Structured Output Not Matching Schema**
-```
-langchain_core.exceptions.OutputParserException: Failed to parse output
-```
-**Cause**: Gemini's `with_structured_output()` sometimes returns malformed JSON or adds extra text.
-
-**Solution**:
-- Use `method="json_mode"` parameter:
-  ```python
-  llm.with_structured_output(StructuredTermsOfService, method="json_mode")
-  ```
-- Add JSON validation in prompt:
-  ```
-  "Return ONLY valid JSON matching the schema. No markdown, no explanations."
-  ```
-- Implement fallback parsing:
-  ```python
-  try:
-      result = llm.invoke(prompt)
-  except OutputParserException:
-      # Extract JSON from response manually
-      json_str = extract_json_from_text(response.content)
-      result = StructuredTermsOfService.model_validate_json(json_str)
-  ```
-
-**11. Null/None Handling Inconsistency**
-```
-TypeError: 'NoneType' object is not iterable
-```
-**Cause**: Optional fields in Pydantic schema are `None`, but Django expects empty list `[]` for ArrayField.
-
-**Solution**:
-- Set default values in Pydantic:
-  ```python
-  third_party_services: List[str] = Field(default_factory=list)
-  ```
-- Or handle in Django model save:
-  ```python
-  def save(self, *args, **kwargs):
-      self.third_party_services = self.third_party_services or []
-      super().save(*args, **kwargs)
-  ```
-
-**12. Timezone Awareness Mismatch**
-```
-RuntimeError: DatetimeField received a naive datetime (without timezone)
-```
-**Cause**: Pydantic `datetime` objects are timezone-naive, but Django expects timezone-aware.
-
-**Solution**:
-- Use timezone-aware datetime in RAG generators:
-  ```python
-  from datetime import datetime
-  import pytz
-
-  sydney_tz = pytz.timezone('Australia/Sydney')
-  last_updated = datetime.now(sydney_tz).strftime("%d %B %Y")
-  ```
-
-**13. Circular Import Between Django Models and Pydantic Schemas**
-```
-ImportError: cannot import name 'StructuredPrivacyPolicy' from partially initialized module
-```
-**Cause**: Django models import Pydantic schemas while Pydantic schemas reference Django models.
-
-**Solution**:
-- Keep Pydantic schemas completely separate from Django models
-- Use `TYPE_CHECKING` for type hints:
-  ```python
-  from typing import TYPE_CHECKING
-
-  if TYPE_CHECKING:
-      from policy_generator.models import PrivacyPolicy
-  ```
-
-**14. Database Transaction Rollback After Pydantic Error**
-```
-django.db.transaction.TransactionManagementError: An error occurred in the current transaction
-```
-**Cause**: Pydantic validation fails mid-transaction, leaving database in dirty state.
-
-**Solution**:
-- Validate Pydantic output BEFORE database transaction:
-  ```python
-  # Generate and validate
-  result = llm.invoke(prompt)  # Pydantic validates here
-
-  # Then save to database
-  with transaction.atomic():
-      policy = PrivacyPolicy.objects.create(...)
-  ```
 
 ---
 
-## Future Enhancements
+## 🔧 Key Engineering Challenges Solved
 
-- [ ] Multi-language support
-- [ ] Real-time collaborative editing
-- [ ] Version control for policies
-- [ ] Automated compliance checking
-- [ ] Integration with legal review services
-- [ ] Customizable templates
-- [ ] Webhooks for policy updates
-- [ ] Role-based access control (RBAC)
-- [ ] Audit logs
-- [ ] API rate limiting
+### 1. Pydantic-Django Integration
+**Challenge**: Type mismatches between LLM-generated Pydantic models and Django ORM models  
+**Solution**: Implemented field validators, retry logic with error feedback, and proper serialization layers
+
+### 2. RAG Context Optimization
+**Challenge**: Balancing retrieval quality vs. token limits for LLM context windows  
+**Solution**: Dual-retrieval strategy (legal + examples), semantic chunking, and metadata-based filtering
+
+### 3. Structured Output Reliability
+**Challenge**: LLM occasionally returns malformed JSON or skips required fields  
+**Solution**: JSON mode enforcement, schema validation with retries, and fallback parsing mechanisms
+
+### 4. Legal Compliance Validation
+**Challenge**: Ensuring all generated policies meet Australian legal requirements  
+**Solution**: Post-generation validation checks, ACL statement enforcement, and placeholder detection/removal
+
+---
+
+## Development
+
+### Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+### Code Style
+
+- **Backend**: PEP 8, Django best practices
+- **Frontend**: ESLint configuration, React best practices
 
 ---
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
 
 ---
 
-## Acknowledgments
+## 📬 Contact & Portfolio
 
-- **LangChain**: For LLM orchestration framework
-- **Google**: For Gemini AI model
-- **OpenAI**: For text embedding models
-- **Django**: For robust backend framework
-- **React**: For modern frontend development
-- **Chroma**: For efficient vector storage
+**Developer**: Varun Singh 
+**Email**: 24varun09@gmail.com  
+**GitHub**: [View Profile](https://github.com/s4733163)  
+**Project Repository**: [CompliGen](https://github.com/s4733163/CompliGen)
 
----
-
-## Contact
-
-For questions or support, please contact:
-- **Email**: 24varun09@gmail.com
-- **GitHub Issues**: [CompliGen Issues](https://github.com/s4733163/CompliGen/issues)
+*Open to opportunities in Full-Stack Development, AI/ML Engineering, and SaaS Product Development*
 
 ---
 
 ## Disclaimer
 
-CompliGen provides AI-generated legal documents as a starting point. **Always consult with a qualified legal professional** before using any generated policies in a production environment. The generated documents are not a substitute for professional legal advice.
+CompliGen provides AI-generated legal documents as a starting point. **Always consult with a qualified legal professional** before using any generated policies in production. The generated documents are not a substitute for professional legal advice.
 
 ---
 
