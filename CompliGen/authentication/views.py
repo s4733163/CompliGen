@@ -70,17 +70,23 @@ def send_email_user(user):
     Args:
         user: Django User object to send verification email to
     """
+    # Generate signed token containing user ID for secure verification
     token = create_email_verification_token(user)
+
+    # Build frontend URL with token as query parameter
     link = f"http://localhost:5173/verify_email?token={token}"
+
     subject = "Verify the email"
     message = f"Hi {user.username},\n\n Thanks for creating an account with compligen . Please click on the link below to verify your identity.\n{link}\n\n. If you did not create an account, please ignore."
 
+    # Send email synchronously - blocks until complete
+    # TODO: Move to Celery for async email delivery in production
     send_mail(
         subject=subject,
         message=message,
         from_email="24varun09@gmail.com",
         recipient_list=[user.email],
-        fail_silently=False,
+        fail_silently=False,  # Raise exception on SMTP errors
     )
 
 
@@ -221,22 +227,27 @@ class ResendEmailVerification(APIView):
     def post(self, request):
         """Generate and send a new verification email."""
         raw_email = request.data.get("email", "")
+
+        # Normalize email to handle case variations (e.g., "User@Email.com" -> "user@email.com")
         email = User.objects.normalize_email(raw_email)
 
+        # Case-insensitive email lookup using __iexact
         user = User.objects.filter(email__iexact=email).first()
 
         if not user:
             return Response({"message": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Verify customer record exists (created during registration)
         customer = Customer.objects.filter(user=user).first()
 
         if not customer:
             return Response({"message": "Customer not found"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Prevent resending if already verified
+        # Prevent unnecessary email sends for already verified accounts
         if customer.verified:
             return Response({"message": "User already verified"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Generate new token and send fresh verification email
         send_email_user(user)
 
         return Response({"message": "Email sent successfully."}, status=status.HTTP_201_CREATED)
@@ -265,15 +276,21 @@ def password_reset(user):
     Returns:
         tuple: (uid, token) - URL-safe encoded user ID and reset token
     """
+    # Encode user primary key as URL-safe base64 string
+    # This obscures the actual user ID in the URL
     uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+    # Generate one-time token tied to user's current password hash
+    # Token becomes invalid once password changes (built-in security)
     token = default_token_generator.make_token(user)
 
+    # Build frontend reset URL with uid and token as path parameters
     reset_link = f"http://localhost:5173/reset-password/{uid}/{token}"
 
     subject = "Reset your password"
     message = f"Hi {user.username},\n\nClick the link below to reset your password:\n{reset_link}\n\nIf you didn't request this, please ignore this email."
 
-    # Consider async queue for production to avoid blocking response
+    # Send email synchronously - consider Celery for production
     send_mail(
         subject=subject,
         message=message,
@@ -301,14 +318,19 @@ class UserResetAPIView(APIView):
     def post(self, request):
         """Send password reset email if user exists."""
         raw_email = request.data.get("email")
+
+        # Normalize email for consistent lookup
         email = User.objects.normalize_email(raw_email)
 
+        # Basic validation - frontend should also validate
         if not raw_email:
             return Response({"message": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Case-insensitive email search
         user = User.objects.filter(email__iexact=email).first()
 
-        # Verify user exists and has a password set
+        # Verify user exists and has a password set (not social auth only)
+        # Note: For production, consider always returning success to prevent email enumeration
         if user and user.password.strip():
             uid, token = password_reset(user)
             return Response(
@@ -336,22 +358,27 @@ class PasswordResetAPIView(APIView):
 
     def post(self, request):
         """Validate reset token and update user password."""
+        # Extract reset parameters from request body
         uidb64 = request.data.get('uid')
         token = request.data.get('token')
         new_password = request.data.get('new_password')
 
+        # Ensure all required fields are present
         if not uidb64 or not token or not new_password:
             return Response({"message": "Missing data"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Decode UID and retrieve user
+        # Decode base64 UID back to user primary key
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
             user = User.objects.get(pk=uid)
         except (User.DoesNotExist, ValueError, TypeError, OverflowError):
+            # Catch all decoding and lookup errors - don't reveal which failed
             return Response({"message": "Invalid link"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate token (checks expiry and password hash match)
+        # Validate token - checks both expiry and that password hasn't changed
+        # Token is tied to password hash, so using old token after password change fails
         if default_token_generator.check_token(user, token):
+            # set_password handles hashing - never store plaintext passwords
             user.set_password(new_password)
             user.save()
             return Response({"message": "Password has been reset successfully."}, status=status.HTTP_200_OK)

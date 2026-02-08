@@ -99,23 +99,33 @@ class PrivacyPolicyView(APIView):
         try:
             user = request.user
             data = request.data
+
+            # Get customer record to link policy ownership
             customer = Customer.objects.filter(user=user).first()
 
-            # Generate policy using RAG (retrieval + Gemini generation)
+            # === RAG PIPELINE EXECUTION ===
+            # 1. Retrieves relevant legal docs from ChromaDB (Privacy Act, APPs)
+            # 2. Retrieves industry-specific policy examples
+            # 3. Constructs prompt with retrieved context + user data
+            # 4. Generates structured policy via Gemini LLM
+            # 5. Validates output against Pydantic schema
             generated_policy = generate_privacy_policy(**data)
 
-            # Validate and save to database with nested sections
+            # Validate LLM output and save to database
+            # Serializer handles nested section creation via nested serializers
             serializer = PrivacyPolicyCreateSerializer(
                 data=generated_policy,
-                context={"customer": customer}
+                context={"customer": customer}  # Pass customer for foreign key
             )
             serializer.is_valid(raise_exception=True)
             saved_obj = serializer.save()
 
+            # Attach database ID for frontend reference
             generated_policy["id"] = saved_obj.id
             return Response(generated_policy, status=200)
 
         except IntegrityError as e:
+            # Database constraint violation (e.g., duplicate, null constraint)
             log_exception(logger, request, e, "PrivacyPolicy IntegrityError")
             return Response(
                 {"error": "Policy failed to generate. Please retry"},
@@ -123,6 +133,7 @@ class PrivacyPolicyView(APIView):
             )
 
         except serializers.ValidationError as e:
+            # LLM output didn't match expected schema structure
             log_exception(logger, request, e, "PrivacyPolicy ValidationError")
             return Response(
                 {"error": "Policy failed to generate. Please retry"},
@@ -130,6 +141,7 @@ class PrivacyPolicyView(APIView):
             )
 
         except Exception as e:
+            # Catch-all for LLM errors, network issues, etc.
             log_exception(logger, request, e, "PrivacyPolicy UnknownError")
             return Response(
                 {"error": "Policy failed to generate. Please retry"},
@@ -140,9 +152,15 @@ class PrivacyPolicyView(APIView):
         """Retrieve all privacy policies for the authenticated user."""
         try:
             user = request.user
+
+            # Get customer record to filter policies by ownership
             customer = Customer.objects.filter(user=user).first()
 
+            # Fetch all policies for this customer, newest first
+            # order_by("-created_at") ensures most recent appears first
             policies = PrivacyPolicy.objects.filter(customer_linked=customer).order_by("-created_at")
+
+            # Serialize with nested sections included (via ReadSerializer)
             serializer = PrivacyPolicyReadSerializer(policies, many=True)
             return Response(serializer.data, status=200)
 
@@ -176,10 +194,15 @@ class TermsOfServiceView(APIView):
         try:
             user = request.user
             data = request.data
+
+            # Link policy to authenticated user's customer account
             customer = Customer.objects.filter(user=user).first()
 
+            # RAG pipeline: retrieves ACL laws + ToS examples, generates via Gemini
+            # Ensures Australian Consumer Law compliance statements are included
             generated_policy = generate_terms_of_service(**data)
 
+            # Validate and persist with customer foreign key
             serializer = TermsOfServiceSerializer(
                 data=generated_policy,
                 context={"customer": customer}
@@ -187,18 +210,22 @@ class TermsOfServiceView(APIView):
             serializer.is_valid(raise_exception=True)
             saved_obj = serializer.save()
 
+            # Include database ID in response for frontend tracking
             generated_policy["id"] = saved_obj.id
             return Response(generated_policy, status=200)
 
         except IntegrityError as e:
+            # Database constraint violation during save
             log_exception(logger, request, e, "ToS IntegrityError")
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
 
         except serializers.ValidationError as e:
+            # Schema mismatch between LLM output and expected structure
             log_exception(logger, request, e, "ToS ValidationError")
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
 
         except Exception as e:
+            # Catch LLM API errors, timeouts, malformed responses
             log_exception(logger, request, e, "ToS UnknownError")
             return Response({"error": "Policy failed to generate. Please retry"}, status=500)
 
@@ -208,7 +235,10 @@ class TermsOfServiceView(APIView):
             user = request.user
             customer = Customer.objects.filter(user=user).first()
 
+            # Filter by customer ownership, sort by newest first
             policies = TermsOfService.objects.filter(customer_linked=customer).order_by('-created_at')
+
+            # ConversionSerializer handles nested ToS sections
             serializer = TermsOfServiceConversionSerializer(policies, many=True)
             return Response(serializer.data, status=200)
 
@@ -244,8 +274,14 @@ class DataProcessisingAgreementView(APIView):
             data = request.data
             customer = Customer.objects.filter(user=user).first()
 
+            # RAG pipeline generates GDPR-style DPA with:
+            # - Controller/processor definitions
+            # - Security measures and obligations
+            # - Sub-processor management terms
+            # - Annex A (processing details) and Annex B (security measures)
             generated_policy = generate_data_processing_agreement(**data)
 
+            # Serialize complex nested structure (sections, annexes, sub-processors)
             serializer = DataProcessingAgreementCreateSerializer(
                 data=generated_policy,
                 context={"customer": customer}
@@ -273,6 +309,7 @@ class DataProcessisingAgreementView(APIView):
             user = request.user
             customer = Customer.objects.filter(user=user).first()
 
+            # DPAs include complex nested structures (annexes, sub-processors)
             policies = DataProcessingAgreement.objects.filter(customer_linked=customer).order_by("-created_at")
             serializer = DataProcessingAgreementReadSerializer(policies, many=True)
             return Response(serializer.data, status=200)
@@ -309,6 +346,11 @@ class AcceptableUsePolicyView(APIView):
             data = request.data
             customer = Customer.objects.filter(user=user).first()
 
+            # RAG pipeline generates AUP covering:
+            # - Permitted and prohibited activities
+            # - Monitoring and enforcement policies
+            # - Violation consequences and appeals
+            # - Abuse reporting mechanisms
             generated_policy = generate_acceptable_use_policy(**data)
 
             serializer = AcceptableUsePolicyCreateSerializer(
@@ -339,6 +381,7 @@ class AcceptableUsePolicyView(APIView):
             user = request.user
             customer = Customer.objects.filter(user=user).first()
 
+            # Fetch AUPs with nested sections included
             policies = AcceptableUsePolicy.objects.filter(customer_linked=customer).order_by("-created_at")
             serializer = AcceptableUsePolicyReadSerializer(policies, many=True)
             return Response(serializer.data, status=200)
@@ -376,8 +419,14 @@ class CookiePolicyView(APIView):
             data = request.data
             customer = Customer.objects.filter(user=user).first()
 
+            # RAG pipeline generates cookie policy (800-1500 words) covering:
+            # - Cookie types (essential, analytics, marketing, preferences)
+            # - Purpose and duration of each cookie
+            # - Third-party services and their cookies
+            # - Browser-specific opt-out instructions
             generated_policy = generate_cookie_policy(**data)
 
+            # Serialize nested structure (sections, third-party services, browser instructions)
             serializer = CookiePolicyCreateSerializer(
                 data=generated_policy,
                 context={"customer": customer}
@@ -406,6 +455,7 @@ class CookiePolicyView(APIView):
             user = request.user
             customer = Customer.objects.filter(user=user).first()
 
+            # Includes nested third-party services and browser instructions
             policies = CookiePolicy.objects.filter(customer_linked=customer).order_by("-created_at")
             serializer = CookiePolicyReadSerializer(policies, many=True)
             return Response(serializer.data, status=200)
@@ -436,10 +486,16 @@ class PrivacyPolicyDeleteView(APIView):
         user = request.user
         customer = Customer.objects.filter(user=user).first()
 
+        # Filter by BOTH id and customer to enforce ownership check
+        # Prevents users from deleting other users' policies
         obj = PrivacyPolicy.objects.filter(id=id, customer_linked=customer).first()
+
         if not obj:
+            # Return 404 whether policy doesn't exist OR user doesn't own it
+            # This prevents information disclosure about other users' policies
             return Response({"error": "Not found"}, status=status.HTTP_404_NOT_FOUND)
 
+        # CASCADE delete removes related sections automatically (via ForeignKey)
         obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -569,13 +625,15 @@ class DashboardView(APIView):
         if not customer:
             return Response({"error": "Customer not found"}, status=404)
 
-        # Aggregate policy counts for each type
+        # === AGGREGATE COUNTS ===
+        # Use .count() for efficient SQL COUNT queries instead of len()
         privacy_count = PrivacyPolicy.objects.filter(customer_linked=customer).count()
         tos_count = TermsOfService.objects.filter(customer_linked=customer).count()
         dpa_count = DataProcessingAgreement.objects.filter(customer_linked=customer).count()
         aup_count = AcceptableUsePolicy.objects.filter(customer_linked=customer).count()
         cookie_count = CookiePolicy.objects.filter(customer_linked=customer).count()
 
+        # Sum all policy types for total count
         total_policies = (
             privacy_count
             + tos_count
@@ -584,7 +642,9 @@ class DashboardView(APIView):
             + cookie_count
         )
 
-        # Fetch most recent policy of each type for quick access
+        # === FETCH LATEST POLICIES ===
+        # Get most recent policy of each type for "quick access" section
+        # .first() returns None if no policies exist (handled in response)
         latest_privacy = PrivacyPolicy.objects.filter(
             customer_linked=customer
         ).order_by("-created_at").first()
@@ -605,6 +665,8 @@ class DashboardView(APIView):
             customer_linked=customer
         ).order_by("-created_at").first()
 
+        # === BUILD RESPONSE ===
+        # Structure matches frontend dashboard component expectations
         response = {
             "total_policies": total_policies,
             "counts": {
@@ -615,6 +677,8 @@ class DashboardView(APIView):
                 "cookie_policy": cookie_count,
             },
             "latest": {
+                # Serialize each policy if exists, otherwise return null
+                # Frontend handles null gracefully (shows "No policies yet")
                 "privacy_policy": (
                     PrivacyPolicyReadSerializer(latest_privacy).data
                     if latest_privacy else None
