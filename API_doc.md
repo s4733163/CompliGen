@@ -1054,8 +1054,18 @@ curl -X DELETE http://localhost:8000/documents/generate/api/privacypolicy/1 \
 
 ---
 
+## License & Usage Restrictions
+
+**This project is NOT open source and is NOT licensed for public use.**
+
+Cloning, hosting, deploying, or using this codebase in any product without explicit written permission from the author is strictly prohibited.
+
+> Copyright © 2026 Varun Singh. All rights reserved.
+
+---
+
 ## Support
 
-For API issues or questions:
+For API issues, questions, or licensing enquiries:
 - **Email**: 24varun09@gmail.com
 - **GitHub Issues**: [CompliGen Issues](https://github.com/s4733163/CompliGen/issues)

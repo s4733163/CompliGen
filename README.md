@@ -392,9 +392,20 @@ for attempt in range(max_retries):
 
 ---
 
-## License
+## License & Usage Restrictions
 
-This project is licensed under the MIT License.
+**This project is NOT open source and is NOT licensed for public use.**
+
+All rights reserved. You may view and reference this code for educational purposes, but the following are strictly prohibited without explicit written permission from the author:
+
+- Hosting or deploying this application (publicly or privately)
+- Using this codebase or any part of it in a commercial product
+- Redistributing, sublicensing, or re-publishing this code
+- Cloning this repository to create a competing or derivative service
+
+For permissions or licensing enquiries, contact: **24varun09@gmail.com**
+
+> Copyright © 2026 Varun Singh. All rights reserved.
 
 ---
 

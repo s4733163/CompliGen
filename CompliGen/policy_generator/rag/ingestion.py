@@ -2,11 +2,16 @@ import os
 from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_chroma import Chroma
 from pathlib import Path
 from langchain_community.document_loaders import PyPDFLoader
 from uuid import uuid4
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
+from qdrant_client.models import VectorParams, Distance
+from qdrant_client.http.exceptions import UnexpectedResponse
+
+COLLECTION = "ingested_law_docs"
+VECTOR_SIZE = 1536  # text-embedding-3-small
 
 # Load environment
 load_dotenv()
@@ -26,12 +31,37 @@ splitter = RecursiveCharacterTextSplitter(
     separators=["\n\n", "\n", ". ", " ", ""]
 )
 
-# Initialize vector store
-vector_store = Chroma(
-    embedding_function=embeddings,  
-    collection_name="ingested_law_docs",
-    persist_directory="./chroma"
+# Qdrant client
+client = QdrantClient(
+    url=os.environ.get("QDRANT_URL"),
+    api_key=os.environ.get("QDRANT_API_KEY"),
 )
+
+# check if the client originally exist or not
+try:
+    client.get_collection(COLLECTION)
+    print(f"✅ Collection exists: {COLLECTION}")
+except UnexpectedResponse as e:
+    # Qdrant returns 404 if not found
+    if "doesn't exist" in str(e) or "404" in str(e):
+        print(f"⚠️ Collection missing. Creating: {COLLECTION}")
+        client.create_collection(
+            collection_name=COLLECTION,
+            vectors_config=VectorParams(
+                size=VECTOR_SIZE,
+                distance=Distance.COSINE,
+            ),
+        )
+    else:
+        raise
+
+# Create vector store
+vector_store = QdrantVectorStore(
+    client=client,
+    collection_name="ingested_law_docs",
+    embedding=embeddings,
+)
+
 
 # Get directories
 BASE_DIR = Path(__file__).resolve().parent
@@ -163,5 +193,6 @@ print("\n" + "="*50)
 print("✅ Ingestion Complete!")
 print(f"📄 Total Files Processed: {total_files}")
 print(f"📦 Total Chunks Created: {total_chunks}")
-print(f"💾 Vector DB Location: ./chroma")
+print("💾 Vector DB: Qdrant Cloud")
+print("📚 Collection: ingested_law_docs")
 print("="*50)
