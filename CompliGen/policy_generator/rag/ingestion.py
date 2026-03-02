@@ -7,7 +7,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from uuid import uuid4
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
-from qdrant_client.models import VectorParams, Distance
+from qdrant_client.models import VectorParams, Distance, PayloadSchemaType
 from qdrant_client.http.exceptions import UnexpectedResponse
 
 COLLECTION = "ingested_law_docs"
@@ -54,6 +54,14 @@ except UnexpectedResponse as e:
         )
     else:
         raise
+
+# Ensure payload indexes exist for filtered fields
+for field_name in ("metadata.doc_type", "metadata.policy_type"):
+    client.create_payload_index(
+        collection_name=COLLECTION,
+        field_name=field_name,
+        field_schema=PayloadSchemaType.KEYWORD,
+    )
 
 # Create vector store
 vector_store = QdrantVectorStore(

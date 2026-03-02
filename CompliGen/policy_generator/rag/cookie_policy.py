@@ -1,15 +1,14 @@
 import os
 from dotenv import load_dotenv
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_chroma import Chroma
-import time
 from langchain_google_genai import ChatGoogleGenerativeAI
-import random
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from .cookie_output import StructuredCookiePolicy
 from langchain_openai import OpenAIEmbeddings
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
+from qdrant_client.models import Filter, FieldCondition, MatchValue
 
 # Load environment
 load_dotenv()
@@ -24,16 +23,20 @@ llm = ChatGoogleGenerativeAI(
 
 # Initialize embeddings model
 embeddings = OpenAIEmbeddings(
-    model="text-embedding-3-small",  # Cost-effective and good quality
+    model="text-embedding-3-small",
     openai_api_key=os.environ.get("OPENAI_API_KEY")
 )
 
+# Initialize Qdrant client and vector store
+client = QdrantClient(
+    url=os.environ.get("QDRANT_URL"),
+    api_key=os.environ.get("QDRANT_API_KEY"),
+)
 
-# initialise the vector store
-vector_store = Chroma(
-    embedding_function=embeddings,  
+vector_store = QdrantVectorStore(
+    client=client,
     collection_name="ingested_law_docs",
-    persist_directory="./chroma"
+    embedding=embeddings,
 )
 
 # Simple prompt template
@@ -201,18 +204,16 @@ def generate_cookie_policy(
     legal_docs = vector_store.similarity_search(
         legal_query,
         k=8,
-        filter={"doc_type": "law"}
+        filter=Filter(must=[FieldCondition(key="metadata.doc_type", match=MatchValue(value="law"))])
     )
 
     example_docs = vector_store.similarity_search(
         example_query,
         k=6,
-        filter={
-            "$and": [
-                {"doc_type": "example"},
-                {"policy_type": "Cookies Policy"}
-            ]
-        }
+        filter=Filter(must=[
+            FieldCondition(key="metadata.doc_type", match=MatchValue(value="example")),
+            FieldCondition(key="metadata.policy_type", match=MatchValue(value="Cookies Policy")),
+        ])
     )
 
     legal_context = "\n\n---\n\n".join([doc.page_content for doc in legal_docs])
