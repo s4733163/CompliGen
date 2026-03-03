@@ -4,11 +4,13 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
-from langchain_chroma import Chroma
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from .policy_outputs import StructuredDataProcessingAgreement
 from langchain_openai import OpenAIEmbeddings
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
+from qdrant_client.models import Filter, FieldCondition, MatchValue
 
 # -----------------------------
 # Setup
@@ -23,15 +25,20 @@ llm = ChatGoogleGenerativeAI(
 )
 
 embeddings = OpenAIEmbeddings(
-    model="text-embedding-3-small",  # Cost-effective and good quality
+    model="text-embedding-3-small",
     openai_api_key=os.environ.get("OPENAI_API_KEY")
 )
 
+# Initialize Qdrant client and vector store
+client = QdrantClient(
+    url=os.environ.get("QDRANT_URL"),
+    api_key=os.environ.get("QDRANT_API_KEY"),
+)
 
-vector_store = Chroma(
-    embedding_function=embeddings,
+vector_store = QdrantVectorStore(
+    client=client,
     collection_name="ingested_law_docs",
-    persist_directory="./chroma",
+    embedding=embeddings,
 )
 
 prompt_template = ChatPromptTemplate.from_messages([("human", "{input}")])
@@ -164,18 +171,16 @@ def generate_data_processing_agreement(
     legal_docs = vector_store.similarity_search(
         "Australia Privacy Act 1988 APP 8 overseas disclosure Notifiable Data Breaches scheme processor obligations",
         k=8,
-        filter={"doc_type": "law"},
+        filter=Filter(must=[FieldCondition(key="metadata.doc_type", match=MatchValue(value="law"))]),
     )
 
     example_docs = vector_store.similarity_search(
         f"Australian SaaS data processing agreement annex security measures sub-processors {industry_type}",
         k=8,
-        filter={
-            "$and": [
-                {"doc_type": "example"},
-                {"policy_type": "Data Processing Agreement"},
-            ]
-        },
+        filter=Filter(must=[
+            FieldCondition(key="metadata.doc_type", match=MatchValue(value="example")),
+            FieldCondition(key="metadata.policy_type", match=MatchValue(value="Data Processing Agreement")),
+        ]),
     )
 
     prompt = DPA_PROMPT.format(

@@ -1,12 +1,14 @@
 import os
 from dotenv import load_dotenv
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
-from langchain_chroma import Chroma
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from .policy_outputs import StructuredTermsOfService
 from langchain_openai import OpenAIEmbeddings
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
+from qdrant_client.models import Filter, FieldCondition, MatchValue
 
 # Load environment
 load_dotenv()
@@ -19,17 +21,21 @@ llm = ChatGoogleGenerativeAI(
     streaming=False,
 )
 
-
 embeddings = OpenAIEmbeddings(
-    model="text-embedding-3-small",  # Cost-effective and good quality
+    model="text-embedding-3-small",
     openai_api_key=os.environ.get("OPENAI_API_KEY")
 )
 
-# Initialise the vector store
-vector_store = Chroma(
-    embedding_function=embeddings,
+# Initialize Qdrant client and vector store
+client = QdrantClient(
+    url=os.environ.get("QDRANT_URL"),
+    api_key=os.environ.get("QDRANT_API_KEY"),
+)
+
+vector_store = QdrantVectorStore(
+    client=client,
     collection_name="ingested_law_docs",
-    persist_directory="./chroma",
+    embedding=embeddings,
 )
 
 # Simple prompt template
@@ -183,18 +189,21 @@ def generate_terms_of_service(
 
     # Retrieve legal and example docs
     legal_docs = vector_store.similarity_search(
-        legal_query, k=10, filter={"doc_type": "law"}
+        legal_query,
+        k=10,
+        filter=Filter(must=[FieldCondition(key="metadata.doc_type", match=MatchValue(value="law"))])
     )
     example_docs = vector_store.similarity_search(
         example_query,
         k=8,
-        filter={
-            "$and": [
-                {"doc_type": "example"},
-                # Allow both variants if your ingestion isn't consistent
-                {"$or": [{"policy_type": "Terms of use"}, {"policy_type": "Terms of Service"}]},
-            ]
-        },
+        filter=Filter(
+            # must = AND, should = OR (at least one must match)
+            must=[FieldCondition(key="metadata.doc_type", match=MatchValue(value="example"))],
+            should=[
+                FieldCondition(key="metadata.policy_type", match=MatchValue(value="Terms of use")),
+                FieldCondition(key="metadata.policy_type", match=MatchValue(value="Terms of Service")),
+            ],
+        ),
     )
 
     # Context (guidance only)

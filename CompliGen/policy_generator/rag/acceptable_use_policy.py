@@ -2,11 +2,13 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
-from langchain_chroma import Chroma
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from .policy_outputs import StructuredAcceptableUsePolicy
 from langchain_openai import OpenAIEmbeddings
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
+from qdrant_client.models import Filter, FieldCondition, MatchValue
 
 # -----------------------------
 # Setup (same as your pattern)
@@ -25,10 +27,16 @@ embeddings = OpenAIEmbeddings(
     openai_api_key=os.environ.get("OPENAI_API_KEY")
 )
 
-vector_store = Chroma(
-    embedding_function=embeddings,
+# Initialize Qdrant client and vector store
+client = QdrantClient(
+    url=os.environ.get("QDRANT_URL"),
+    api_key=os.environ.get("QDRANT_API_KEY"),
+)
+
+vector_store = QdrantVectorStore(
+    client=client,
     collection_name="ingested_law_docs",
-    persist_directory="./chroma",
+    embedding=embeddings,
 )
 
 prompt_template = ChatPromptTemplate.from_messages([("human", "{input}")])
@@ -133,18 +141,16 @@ def generate_acceptable_use_policy(
     legal_docs = vector_store.similarity_search(
         "acceptable use policy Australia platform misuse monitoring enforcement illegal activity reporting",
         k=8,
-        filter={"doc_type": "law"},
+        filter=Filter(must=[FieldCondition(key="metadata.doc_type", match=MatchValue(value="law"))]),
     )
 
     example_docs = vector_store.similarity_search(
         f"acceptable use policy {industry_type} SaaS prohibited activities monitoring enforcement",
         k=8,
-        filter={
-            "$and": [
-                {"doc_type": "example"},
-                {"policy_type": "Acceptable Use Policy"},
-            ]
-        },
+        filter=Filter(must=[
+            FieldCondition(key="metadata.doc_type", match=MatchValue(value="example")),
+            FieldCondition(key="metadata.policy_type", match=MatchValue(value="Acceptable Use Policy")),
+        ]),
     )
 
     prompt = AUP_PROMPT.format(
