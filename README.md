@@ -11,7 +11,7 @@
 ## 🎯 Project Highlights
 
 - **Full-Stack Development**: End-to-end implementation of enterprise SaaS platform with React frontend and Django REST backend
-- **AI/ML Integration**: Implemented production RAG pipeline using LangChain, ChromaDB vector database, and Google Gemini LLM
+- **AI/ML Integration**: Implemented production RAG pipeline using LangChain, Qdrant vector database, and Google Gemini LLM
 - **Legal Compliance Engine**: Automated generation of 5 policy types compliant with Australian Privacy Act 1988 and Consumer Law
 - **Scalable Architecture**: PostgreSQL database with optimized vector search, JWT authentication, and RESTful API design
 - **Production Features**: Email verification system, PDF generation, secure CORS configuration, and comprehensive error handling
@@ -32,7 +32,7 @@ CompliGen is an enterprise-grade full-stack web application that automates the g
 ### 🚀 Key Features & Technical Achievements
 
 - **AI-Powered Policy Generation**: Integrated Google Gemini 2.0 Flash with structured output using Pydantic schemas for type-safe, validated document generation
-- **Advanced RAG Pipeline**: Built custom document ingestion pipeline with semantic chunking, OpenAI embeddings, and ChromaDB vector storage for context retrieval
+- **Advanced RAG Pipeline**: Built custom document ingestion pipeline with semantic chunking, OpenAI embeddings, and Qdrant vector storage for context retrieval
 - **Australian Legal Compliance**: Engineered validation system ensuring adherence to 13 Australian Privacy Principles (APPs) and ACL requirements
 - **5 Policy Types**: Terms of Service, Privacy Policy, Cookie Policy, Data Processing Agreement, Acceptable Use Policy
 - **Production-Grade Authentication**: Implemented JWT-based auth flow with email verification, token refresh, and password reset functionality
@@ -71,7 +71,7 @@ CompliGen is an enterprise-grade full-stack web application that automates the g
 
 **Frontend**: React 19, Vite, Material-UI, React Router, @react-pdf/renderer  
 **Backend**: Django 5.1.7, Django REST Framework, PostgreSQL, SimpleJWT  
-**AI/LLM**: LangChain, ChromaDB, OpenAI Embeddings (text-embedding-3-small), Google Gemini (gemini-2.0-flash-exp)
+**AI/LLM**: LangChain, Qdrant, OpenAI Embeddings (text-embedding-3-small), Google Gemini (gemini-2.0-flash-exp)
 
 ### Architecture
 
@@ -84,7 +84,7 @@ CompliGen is an enterprise-grade full-stack web application that automates the g
                           ┌─────────▼──────────┐
                           │    RAG System      │
                           │  ┌──────────────┐  │
-                          │  │  ChromaDB    │  │
+                          │  │   Qdrant     │  │
                           │  │  (Vectors)   │  │
                           │  └──────────────┘  │
                           │         ▼          │
@@ -184,7 +184,7 @@ CompliGen/
 │   │   ├── Laws/                  # Australian regulations
 │   │   ├── examples/              # Real-world policy examples
 │   │   └── policy_template/       # Templates
-│   ├── chroma/                    # ChromaDB vector storage
+│   ├── qdrant/                    # Qdrant vector storage
 │   └── manage.py
 │
 └── CompliGen_Frontend/            # React Frontend
@@ -208,7 +208,7 @@ CompliGen/
 - Automated PDF processing with metadata extraction and tagging
 - Semantic chunking (1000 chars, 200 overlap) optimized for legal document structure
 - OpenAI text-embedding-3-small for high-quality vector representations
-- ChromaDB persistence layer with filtered similarity search
+- Qdrant persistence layer with filtered similarity search
 
 **Intelligent Retrieval Strategy:**
 - Dual-context retrieval: Legal documents (k=10) + Industry examples (k=8)
@@ -265,7 +265,7 @@ PolicyGeneratorDocuments/
 ### Generation Pipeline
 
 1. **User Input** → Company info and requirements
-2. **Retrieval** → Semantic search in ChromaDB (legal docs k=10, examples k=8)
+2. **Retrieval** → Semantic search in Qdrant (legal docs k=10, examples k=8)
 3. **Augmentation** → Combine retrieved context with user data
 4. **Generation** → Gemini generates structured policy via Pydantic schemas
 5. **Validation** → Ensure compliance and remove placeholders
@@ -332,7 +332,7 @@ django.db.utils.OperationalError: could not connect to server
 ```
 → Ensure PostgreSQL is running and `.env` credentials are correct
 
-**ChromaDB Not Found**
+**Qdrant Not Found**
 ```python
 from policy_generator.rag.ingestion import ingest_documents
 ingest_documents()
