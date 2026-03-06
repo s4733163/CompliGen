@@ -135,6 +135,8 @@ GMAIL=your_email@gmail.com
 GMAIL_PASSWORD=your_gmail_app_password
 GOOGLE_API_KEY=your_gemini_api_key
 OPENAI_API_KEY=your_openai_api_key
+QDRANT_URL=your_qdrant_url
+QDRANT_API_KEY=your_qdrant_api_key
 EOL
 
 # Run migrations
