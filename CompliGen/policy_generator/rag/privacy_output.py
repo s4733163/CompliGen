@@ -133,7 +133,14 @@ class StructuredPrivacyPolicy(BaseModel):
     )
     @classmethod
     def sanitize_single_fields(cls, v: str) -> str:
-        return sanitize_plain_text(v)
+        v = sanitize_plain_text(v)
+        # Strip "Last Updated: " prefix if LLM includes it
+        if v.lower().startswith("last updated:"):
+            v = v[len("last updated:"):].strip()
+        # Extract only the YYYY-MM-DD portion
+        if len(v) >= 10:
+            v = v[:10]
+        return v
 
     @field_validator(
         "introduction",

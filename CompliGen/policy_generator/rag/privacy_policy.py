@@ -1,15 +1,14 @@
 import os
 from dotenv import load_dotenv
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_chroma import Chroma
-import time
 from langchain_google_genai import ChatGoogleGenerativeAI
-import random
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from .privacy_output import StructuredPrivacyPolicy
 from langchain_openai import OpenAIEmbeddings
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
+from qdrant_client.models import Filter, FieldCondition, MatchValue
 
 # Load environment
 load_dotenv()
@@ -23,17 +22,21 @@ llm = ChatGoogleGenerativeAI(
 )
 
 # Initialize embeddings model
-
 embeddings = OpenAIEmbeddings(
-    model="text-embedding-3-small",  # Cost-effective and good quality
+    model="text-embedding-3-small",
     openai_api_key=os.environ.get("OPENAI_API_KEY")
 )
 
-# initialise the vector store
-vector_store = Chroma(
-    embedding_function=embeddings,  
+# Initialize Qdrant client and vector store
+client = QdrantClient(
+    url=os.environ.get("QDRANT_URL"),
+    api_key=os.environ.get("QDRANT_API_KEY"),
+)
+
+vector_store = QdrantVectorStore(
+    client=client,
     collection_name="ingested_law_docs",
-    persist_directory="./chroma"
+    embedding=embeddings,
 )
 
 # Simple prompt template
@@ -192,14 +195,17 @@ def generate_privacy_policy(
     legal_docs = vector_store.similarity_search(
         legal_query,
         k=12,
-        filter={"doc_type": "law"}
+        filter=Filter(must=[FieldCondition(key="metadata.doc_type", match=MatchValue(value="law"))])
     )
 
     # get the example docs chunks
     example_docs = vector_store.similarity_search(
         example_query,
         k=6,
-        filter={"doc_type": "example_privacy_policy"}
+        filter=Filter(must=[
+            FieldCondition(key="metadata.doc_type", match=MatchValue(value="example")),
+            FieldCondition(key="metadata.policy_type", match=MatchValue(value="Privacy Policy")),
+        ])
     )
 
     # get the legal context
@@ -249,7 +255,7 @@ def generate_privacy_policy(
         security_measures = security_measures,
         retention_period = retention_period,
         additional_instructions=additional_instructions,
-        Current_Date=today
+        Current_Date=today.strftime("%Y-%m-%d")
     ) 
 
     # GENERATION STEP
