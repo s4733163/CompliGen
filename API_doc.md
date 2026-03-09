@@ -909,7 +909,7 @@ Currently, the API does not implement rate limiting at the application level. Ho
                                            │ RAG Pipeline│
                                            │ 1. Retrieve │◄──┐
                                            │    legal    │   │
-                                           │    docs     │   │ ChromaDB
+                                           │    docs     │   │ QdrantDB
                                            │ 2. Retrieve │   │ Vector
                                            │    examples │───┘ Search
                                            └──────┬──────┘

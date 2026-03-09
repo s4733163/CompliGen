@@ -18,7 +18,7 @@ All endpoints require JWT authentication and return policies linked to the
 authenticated user's customer account.
 
 RAG Pipeline:
-    User Input → Vector Search (ChromaDB) → Context Augmentation →
+    User Input → Vector Search (QdrantDB) → Context Augmentation →
     Gemini Generation → Pydantic Validation → Database Storage
 """
 
@@ -104,7 +104,7 @@ class PrivacyPolicyView(APIView):
             customer = Customer.objects.filter(user=user).first()
 
             # === RAG PIPELINE EXECUTION ===
-            # 1. Retrieves relevant legal docs from ChromaDB (Privacy Act, APPs)
+            # 1. Retrieves relevant legal docs from QdrantDB (Privacy Act, APPs)
             # 2. Retrieves industry-specific policy examples
             # 3. Constructs prompt with retrieved context + user data
             # 4. Generates structured policy via Gemini LLM
